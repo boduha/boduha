@@ -1,0 +1,18 @@
+@startsalt
+skinparam backgroundColor transparent
+skinparam defaultFontName Monospaced
+
+{+
+  <&question-mark> Question
+  ==
+.
+  " Convert 42 (decimal) to binary "
+.
+  [   101010   ]
+  [   101011   ]
+  [   100101   ]
+  [   111010   ]
+.
+  [ Check ]
+}
+@endsalt

@@ -1,0 +1,19 @@
+@startsalt
+skinparam backgroundColor transparent
+skinparam defaultFontName Monospaced
+
+{+
+  <&check> Correct
+  ==
+.
+  " 42 (DEC) = 101010 (BIN) "
+.
+.
+.
+.
+.
+.
+  [ Continue ]
+}
+
+@endsalt
