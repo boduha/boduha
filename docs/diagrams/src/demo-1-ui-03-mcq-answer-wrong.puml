@@ -1,0 +1,19 @@
+@startsalt
+skinparam backgroundColor transparent
+skinparam defaultFontName Monospaced
+
+{+
+  <&x> Not quite
+  ==
+.
+  " Correct answer is "
+.
+  "      101010       "
+.
+.
+.
+.
+.
+  [ Continue ]
+}
+@endsalt
