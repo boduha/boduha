@@ -1,6 +1,6 @@
-Feature: Demo 1 - Multiple choice base conversion
+Feature: Practice - Multiple choice question about base conversion
 
-  So that I receive immediate feedback and a clear explanation
+  So that I receive immediate feedback
   As a student
   I want to answer a multiple choice question
 
