@@ -12,56 +12,58 @@ const choices: Choice[] = [
   { id: "d", label: "111000" },
 ]
 
+const questionText = "Convert 42 (decimal) to binary:"
 const correctAnswer = "101010"
 
-type ScreenState = "question" | "correct" | "wrong"
+type ScreenState = "question" | "correct" | "notQuite"
 
 export default function Question42() {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
   const [screenState, setScreenState] = useState<ScreenState>("question")
 
-  function handleVerify() {
+  function handleCheck() {
     if (!selectedAnswer) return
+    setScreenState(selectedAnswer === correctAnswer ? "correct" : "notQuite")
+  }
 
-    if (selectedAnswer === correctAnswer) {
-      setScreenState("correct")
-    } else {
-      setScreenState("wrong")
-    }
+  function handleContinue() {
+    setSelectedAnswer(null)
+    setScreenState("question")
   }
 
   if (screenState === "correct") {
     return (
-      <main>
+      <main style={styles.main}>
         <h1>Correct!</h1>
         <p>42 in binary is 101010.</p>
+
+        <button type="button" onClick={handleContinue} style={styles.actionButton}>
+          Continue
+        </button>
       </main>
     )
   }
 
-  if (screenState === "wrong") {
+  if (screenState === "notQuite") {
     return (
-      <main>
+      <main style={styles.main}>
         <h1>Not quite!</h1>
-        <p>Your answer was not correct.</p>
+        <p>Almost there.</p>
+        <p>Correct answer is: 42 in binary is 101010.</p>
+
+        <button type="button" onClick={handleContinue} style={styles.actionButton}>
+          Continue
+        </button>
       </main>
     )
   }
 
   return (
-    <main>
+    <main style={styles.main}>
       <h1>Question</h1>
-      <p>Convert 42 (decimal) to binary:</p>
+      <p>{questionText}</p>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(2, minmax(120px, 1fr))",
-          gap: "12px",
-          maxWidth: "480px",
-          margin: "0 auto 16px",
-        }}
-      >
+      <div style={styles.choicesGrid}>
         {choices.map((choice) => {
           const isSelected = selectedAnswer === choice.label
 
@@ -71,11 +73,9 @@ export default function Question42() {
               type="button"
               onClick={() => setSelectedAnswer(choice.label)}
               style={{
-                padding: "12px",
+                ...styles.choiceButton,
                 border: isSelected ? "2px solid black" : "1px solid #ccc",
-                borderRadius: "8px",
                 background: isSelected ? "#f0f0f0" : "white",
-                cursor: "pointer",
               }}
             >
               {choice.label}
@@ -84,9 +84,47 @@ export default function Question42() {
         })}
       </div>
 
-      <button type="button" onClick={handleVerify} disabled={!selectedAnswer}>
-        Verify
+      <button
+        type="button"
+        onClick={handleCheck}
+        disabled={!selectedAnswer}
+        style={{
+          ...styles.actionButton,
+          background: selectedAnswer ? "white" : "#f5f5f5",
+          cursor: selectedAnswer ? "pointer" : "not-allowed",
+        }}
+      >
+        Check
       </button>
     </main>
   )
+}
+
+const styles = {
+  main: {
+    maxWidth: "640px",
+    margin: "0 auto",
+    padding: "24px",
+    textAlign: "center" as const,
+  },
+  choicesGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(2, minmax(120px, 1fr))",
+    gap: "12px",
+    maxWidth: "480px",
+    margin: "0 auto 16px",
+  },
+  choiceButton: {
+    padding: "12px",
+    borderRadius: "8px",
+    cursor: "pointer",
+  },
+  actionButton: {
+    marginTop: "16px",
+    padding: "12px 20px",
+    border: "1px solid #ccc",
+    borderRadius: "8px",
+    background: "white",
+    cursor: "pointer",
+  },
 }
