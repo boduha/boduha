@@ -1,0 +1,120 @@
+@startuml frontend
+skinparam style strictuml
+skinparam classAttributeIconSize 0
+
+title boduha SPA (demo 1) — React + TypeScript structure (UI ⇄ Client ⇄ Server)
+
+package "UI (React)" {
+  class App <<Component>> {
+    +render(): JSX.Element
+  }
+
+  class Router <<Component>> {
+    +render(): JSX.Element
+  }
+
+  class HomePage <<Component>> {
+    +onStart(): void
+    +render(): JSX.Element
+  }
+
+  class QuestionPage <<Component>> {
+    -selectedChoiceId: string
+    +loadQuestion(): void
+    +onSelect(choiceId: string): void
+    +onCheck(): void
+    +render(): JSX.Element
+  }
+
+  class ResultPage <<Component>> {
+    +onContinue(): void
+    +render(): JSX.Element
+  }
+}
+
+package "State (minimal)" {
+  class PracticeSession <<State>> {
+    +question: Question
+    +attempt: Attempt
+    +result: Result
+  }
+}
+
+package "Client (API layer)" {
+  interface PracticeClient {
+    +getQuestion(): Promise<Question>
+    +postAttempt(attempt: Attempt): Promise<Result>
+  }
+
+  class HttpPraticeClient <<Client>> {
+    -baseUrl: string
+    +getQuestion(): Promise<Question>
+    +postAttempt(attempt: Attempt): Promise<Result>
+  }
+
+  class FakePracticeClient <<Client>> {
+    +getQuestion(): Promise<Question>
+    +postAttempt(attempt: Attempt): Promise<Result>
+  }
+}
+
+package "Domain (types)" {
+  class Question <<Type>> {
+    +id: string
+    +prompt: string
+    +choices: Choice[]
+  }
+
+  class Choice <<Type>> {
+    +id: string
+    +text: string
+  }
+
+  class Attempt <<Type>> {
+    +questionId: string
+    +choiceId: string
+  }
+
+  class Result <<Type>> {
+    +correct: boolean
+    +explanation: string
+  }
+}
+
+package "Server (REST API)" {
+  class PracticeController <<RestController>> {
+    +getQuestion(): Question
+    +postAttempt(attempt: Attempt): Result
+  }
+}
+
+' UI composition
+App --> Router
+Router --> HomePage
+Router --> QuestionPage
+Router --> ResultPage
+
+' UI uses session state
+QuestionPage --> PracticeSession
+ResultPage --> PracticeSession
+
+' UI depends on client abstraction
+HomePage ..> BoduhaClient : uses
+QuestionPage ..> BoduhaClient : uses
+ResultPage ..> BoduhaClient : uses
+
+' Client implementations
+BoduhaClient <|.. HttpBoduhaClient
+BoduhaClient <|.. FakeBoduhaClient
+
+' Client uses domain types
+BoduhaClient ..> Question
+BoduhaClient ..> Attempt
+BoduhaClient ..> Result
+
+Question "1" o-- "1..*" Choice
+
+' Client talks to server (conceptual)
+HttpPracticeClient ..> PracticeController : HTTP GET/POST
+
+@enduml

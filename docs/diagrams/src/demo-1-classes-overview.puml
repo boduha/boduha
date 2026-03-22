@@ -1,0 +1,59 @@
+@startuml overview
+title Demo 1 – Practice MVP (Domain Model)
+
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+
+skinparam nodesep 60
+skinparam ranksep 70
+
+rectangle "Domain Model\n" as DOMAIN {
+
+  package "evaluation.exam" {
+
+class Question {
+  prompt
+}
+
+
+class Choice {
+  text
+}
+class Attempt {
+}
+}
+
+  package "evaluation" {
+
+
+
+class AnswerKey <<secret>> {
+}
+
+class Result {
+  verdict
+}
+
+}
+}
+
+AnswerKey -[hidden]right- Question
+Result    -[hidden]right- Attempt
+
+AnswerKey "1" ----> "1 question" Question
+AnswerKey "1" ---> "1 solution" Choice
+
+Question "1" o-- "1..* choices" Choice
+Attempt ---> "1 question" Question
+Attempt ---> "1 guess" Choice
+Result ---> "1 attempt" Attempt
+
+note left of Attempt
+Attempt.guess must belong to question.choices
+end note
+
+note left of AnswerKey
+AnswerKey.solution must belong to question.choices
+end note
+@enduml
