@@ -48,7 +48,6 @@ Example screen:
 - Appears when the selected answer is incorrect
 - Displays: “Not quite”
 - Displays the expected answer
-- Displays an explanation
 - Allows the learner to continue/finish
 
 Example screen:
@@ -66,6 +65,8 @@ Example screen:
 - Competition or ranking
 - Editing questions
 - Advanced security mechanisms
+- Displays an explanation
+
 
 ---
 
