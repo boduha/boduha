@@ -77,3 +77,46 @@ Security measures to be introduced after MVP validation.
 - They are not commitments.
 - They exist to preserve ideas without expanding current scope.
 - Demo 1 remains focused exclusively on the Practice MVP.
+
+### Rich Content in Questions and Explanations
+- `prompt`, `text` and `explanation` may contain:
+  - images
+  - equations (LaTeX/MathML)
+  - audio
+  - formatted content (HTML/Markdown)
+- UI implications:
+  - scrolling
+  - zoom
+  - pagination
+  - full-screen view
+  - accessibility considerations
+
+### Advanced Evaluation Model
+- `AnswerKey` may evolve from boolean to percentage (0–100%).
+- Each `Choice` may have its own explanation.
+- `Result` may evolve from simple verdict to:
+  - numeric grade
+  - weighted scoring
+  - partial credit
+
+### Security Considerations
+- Avoid exposing correct answers directly in the client.
+- Question identifiers may vary per attempt.
+
+## Application family domain model
+
+Existing educational platforms (e.g., Kahoot, Moodle Quiz, Hot Potatoes) implement a broader assessment domain.
+
+Demo 1 intentionally restricts the scope to a minimal **Practice (MCQ)** interaction.
+
+Out of scope for Demo 1:
+
+- Question banks
+- Authoring tools
+- Course / class management
+- User management
+- Grading history
+- Statistics and reports
+- Competitive modes (timers, leaderboards)
+
+A full educational assessment domain model is acknowledged but explicitly deferred.

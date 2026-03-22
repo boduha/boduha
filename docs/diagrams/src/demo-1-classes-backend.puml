@@ -1,0 +1,44 @@
+@startuml backend
+skinparam style strictuml
+skinparam classAttributeIconSize 0
+
+title boduha (demo 1) — Minimal local version
+
+class BoduhaApplication <<SpringBootApplication>> {
+  +main(args: String[]): void
+}
+
+class PracticeController <<RestController>> {
+  +getQuestion(): Question
+  +postAttempt(attempt: Attempt): Result
+}
+
+class PracticeControllerTest <<UnitTest>> {
+  +getQuestion()
+  +postAttemptCorrect()
+  +postAttemptNotQuite()
+}
+
+class Question {
+  +prompt: String
+  +choices: List<Choice>
+}
+
+class Choice  {
+  +id: int
+  +text: String
+}
+
+class Attempt  {
+  +choiceId : int
+}
+
+class Result {
+  +verdict: boolean
+}
+
+PracticeController ..> Question : returns (GET)
+PracticeController ..> Result : returns (POST)
+PracticeController ..> Attempt : consumes (POST)
+
+@enduml
