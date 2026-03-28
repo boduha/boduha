@@ -12,3 +12,15 @@ The name **boduha** comes from the core topics covered by the tool:
 - **U** – Unicode
 - **H** – Hexadecimal (base 16)
 - **A** – ASCII
+
+## License
+
+This project is licensed under the MIT License.
+
+## Use of Artificial Intelligence
+
+**boduha** was developed with the assistance of Artificial Intelligence tools used in a
+conversational and reflective role (e.g., architectural discussion, diagram modeling,
+and documentation), rather than as inline code generation or autonomous programming agents.
+
+All final decisions and implementations remain the responsibility of the author.
