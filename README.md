@@ -1,3 +1,5 @@
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=boduha_boduha)](https://sonarcloud.io/summary/new_code?id=boduha_boduha)
+
 # boduha
 
 **boduha** is a pedagogical tool designed to help Computer Science students master number base conversions and character representations through structured practice and guided exercises.
