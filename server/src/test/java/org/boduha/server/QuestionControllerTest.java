@@ -1,0 +1,28 @@
+package org.boduha.server;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@WebMvcTest(QuestionController.class)
+public class QuestionControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Test
+    void shouldReturnQuestion42() throws Exception {
+        mockMvc.perform(get("/question/42"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(42))
+                .andExpect(jsonPath("$.statement").value("Convert 42 (decimal) to binary:"))
+                .andExpect(jsonPath("$.alternatives").isArray())
+                .andExpect(jsonPath("$.alternatives.length()").value(4))
+                .andExpect(jsonPath("$.alternatives[0].id").value("a"))
+                .andExpect(jsonPath("$.alternatives[0].label").value("101010"));
+    }
+}
