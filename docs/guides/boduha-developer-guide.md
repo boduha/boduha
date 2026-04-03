@@ -1,4 +1,8 @@
-# Developer Guide
+# Project boduha Developer Guide
+
+2026-04-03
+
+<https://github.com/boduha>
 
 ## 1. Overview
 
@@ -46,7 +50,7 @@ Expected result:
 
 Open the forwarded port (see section 5) and access:
 
-```
+```text
 /question/42
 ```
 
@@ -94,7 +98,7 @@ In GitHub Codespaces:
 
 Click:
 
-```
+```text
 Open in Browser
 ```
 

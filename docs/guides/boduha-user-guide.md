@@ -1,11 +1,11 @@
-# Project boduha
+# Project boduha User Guide
 
 2026-02-28
 
-https://github.com/boduha
-
+<https://github.com/boduha>
 
 ## Demo 1 – Practice MVP
+
 Pre-Demo Approval Document
 
 ## Objective
@@ -24,6 +24,7 @@ Date and sign the document.
 ## What the system does (Demo 1)
 
 ### 1. Practice Screen
+
 - Displays a question statement
 - Displays multiple-choice options
 - Allows the learner to select one option
@@ -33,9 +34,8 @@ Example screen:
 
 ![MCQ](http://www.plantuml.com/plantuml/proxy?cache=no&fmt=svg&src=https://raw.githubusercontent.com/boduha/boduha/refs/heads/main/docs/diagrams/src/demo-1-ui-01-mcq-question.puml)
 
-
-
 ### 2. Correct Screen
+
 - Appears when the selected answer is correct
 - Displays: “Correct”
 - Allows the learner to continue/finish
@@ -45,6 +45,7 @@ Example screen:
 ![MCQ](http://www.plantuml.com/plantuml/proxy?cache=no&fmt=svg&src=https://raw.githubusercontent.com/boduha/boduha/refs/heads/main/docs/diagrams/src/demo-1-ui-02-mcq-answer-correct.puml)
 
 ### 3. NotQuite Screen
+
 - Appears when the selected answer is incorrect
 - Displays: “Not quite”
 - Displays the expected answer
@@ -67,7 +68,6 @@ Example screen:
 - Advanced security mechanisms
 - Displays an explanation
 
-
 ---
 
 ## Agreement
@@ -81,5 +81,4 @@ Date: ______________________
 
 Professor: _______________________________
 
-
-## Remember to send this document back to the project contact.
+## Remember to send this document back to the project contact
