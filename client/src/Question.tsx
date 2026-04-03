@@ -166,7 +166,7 @@ const styles = {
     margin: "0 auto",
     padding: "24px",
     textAlign: "center" as const,
-    color: "white",
+    color: "inherit",
   },
   choicesGrid: {
     display: "grid",
