@@ -4,11 +4,7 @@ import type { AnswerResult, AnswerSubmission, Question } from "./types"
 
 type ScreenState = "loading" | "question" | "correct" | "notQuite" | "error"
 
-type Props = {
-  questionId: number
-}
-
-export default function Question({ questionId }: Props) {
+export default function Question() {
   const [question, setQuestion] = useState<Question | null>(null)
   const [selectedAlternativeId, setSelectedAlternativeId] = useState<string | null>(null)
   const [screenState, setScreenState] = useState<ScreenState>("loading")
@@ -17,12 +13,12 @@ export default function Question({ questionId }: Props) {
   useEffect(() => {
     async function loadQuestion() {
       try {
-        const response = await fetch(`/question/${questionId}`)
+        const response = await fetch(`/question`)
 
         if (!response.ok) {
           throw new Error(`Failed to load question: ${response.status}`)
         }
-        console.log("Loading question", questionId)
+        console.log("Loading question")
         const data: Question = await response.json()
         setQuestion(data)
         setErrorMessage(null)
@@ -35,14 +31,14 @@ export default function Question({ questionId }: Props) {
     }
 
     loadQuestion()
-  }, [questionId])
+  }, [])
 
   async function handleCheck() {
     if (!selectedAlternativeId || !question) return
 
     try {
       const submission: AnswerSubmission = { answer: selectedAlternativeId }
-      const response = await fetch(`/question/${questionId}/answer`, {
+      const response = await fetch(`/question/${question.id}/answer`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class QuestionController {
 
-    @GetMapping("/question/{id}")
-    public Question getQuestion(@PathVariable Integer id) {
+    @GetMapping("/question")
+    public Question getQuestion() {
         return new Question(
                 42,
                 "Convert 42 (decimal) to binary:",

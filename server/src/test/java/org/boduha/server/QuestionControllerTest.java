@@ -17,7 +17,7 @@ public class QuestionControllerTest {
 
     @Test
     void shouldReturnQuestion42() throws Exception {
-        mockMvc.perform(get("/question/42"))
+        mockMvc.perform(get("/question"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(42))
                 .andExpect(jsonPath("$.statement").value("Convert 42 (decimal) to binary:"))
