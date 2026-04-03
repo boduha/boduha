@@ -18,6 +18,6 @@ public class HomeControllerTest {
     void shouldReturnHomeMessage() throws Exception {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Boduha backend is running."));
+                .andExpect(content().string("Boduha server is running."));
     }
 }

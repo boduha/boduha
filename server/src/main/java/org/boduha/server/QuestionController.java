@@ -1,25 +1,35 @@
 package org.boduha.server;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class QuestionController {
 
-    @GetMapping("/question/42")
-    public Map<String, Object> getQuestion42() {
-        return Map.of(
-            "id", 42,
-            "statement", "Convert 42 (decimal) to binary:",
-            "alternatives", List.of(
-                Map.of("id", "a", "label", "101010", "correct", true),
-                Map.of("id", "b", "label", "100101", "correct", false),
-                Map.of("id", "c", "label", "110010", "correct", false),
-                Map.of("id", "d", "label", "111000", "correct", false)
-            )
-        );
+    @GetMapping("/question/{id}")
+    public Question getQuestion(@PathVariable Integer id) {
+        return new Question(
+                42,
+                "Convert 42 (decimal) to binary:",
+                List.of(
+                        new Alternative("a", "101010"),
+                        new Alternative("b", "100101"),
+                        new Alternative("c", "110010"),
+                        new Alternative("d", "111000")));
+    }
+
+    @PostMapping("/question/{id}/answer")
+    public AnswerResult checkAnswer(
+            @PathVariable Integer id,
+            @RequestBody AnswerSubmission submission) {
+
+        boolean correct = "a".equals(submission.answer());
+
+        return new AnswerResult(id, submission.answer(), correct);
     }
 }
