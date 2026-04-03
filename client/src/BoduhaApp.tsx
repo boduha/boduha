@@ -1,7 +1,7 @@
 import './BoduhaApp.css'
 
-import Question42 from "./Question"
+import Question from "./Question"
 
 export default function BoduhaApp() {
-  return <Question42 />
+  return <Question questionId={42} />
 }

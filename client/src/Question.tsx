@@ -1,41 +1,31 @@
 import { useEffect, useState } from "react"
 
-type Alternative = {
-  id: string
-  label: string
-}
-
-type Question = {
-  id: number
-  statement: string
-  alternatives: Alternative[]
-}
-
-type AnswerResult = {
-  questionId: number
-  selected: string
-  correct: boolean
-}
+import type { AnswerResult, AnswerSubmission, Question } from "./types"
 
 type ScreenState = "loading" | "question" | "correct" | "notQuite" | "error"
 
-export default function Question42() {
+type Props = {
+  questionId: number
+}
+
+export default function Question({ questionId }: Props) {
   const [question, setQuestion] = useState<Question | null>(null)
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
+  const [selectedAlternativeId, setSelectedAlternativeId] = useState<string | null>(null)
   const [screenState, setScreenState] = useState<ScreenState>("loading")
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   useEffect(() => {
     async function loadQuestion() {
       try {
-        const response = await fetch("/question/42")
+        const response = await fetch(`/question/${questionId}`)
 
         if (!response.ok) {
           throw new Error(`Failed to load question: ${response.status}`)
         }
-
+        console.log("Loading question", questionId)
         const data: Question = await response.json()
         setQuestion(data)
+        setErrorMessage(null)
         setScreenState("question")
       } catch (error) {
         console.error("Error loading question", error)
@@ -45,18 +35,19 @@ export default function Question42() {
     }
 
     loadQuestion()
-  }, [])
+  }, [questionId])
 
   async function handleCheck() {
-    if (!selectedAnswer || !question) return
+    if (!selectedAlternativeId || !question) return
 
     try {
-      const response = await fetch(`/question/${question.id}/answer`, {
+      const submission: AnswerSubmission = { answer: selectedAlternativeId }
+      const response = await fetch(`/question/${questionId}/answer`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ answer: selectedAnswer }),
+        body: JSON.stringify(submission)
       })
 
       if (!response.ok) {
@@ -73,7 +64,7 @@ export default function Question42() {
   }
 
   function handleContinue() {
-    setSelectedAnswer(null)
+    setSelectedAlternativeId(null)
     setScreenState("question")
   }
 
@@ -100,7 +91,7 @@ export default function Question42() {
 
   if (screenState === "correct") {
     const selectedLabel =
-      question.alternatives.find((alternative) => alternative.id === selectedAnswer)?.label ?? ""
+      question.alternatives.find((alternative) => alternative.id === selectedAlternativeId)?.label ?? ""
 
     return (
       <main style={styles.main}>
@@ -134,13 +125,13 @@ export default function Question42() {
 
       <div style={styles.choicesGrid}>
         {question.alternatives.map((alternative) => {
-          const isSelected = selectedAnswer === alternative.id
+          const isSelected = selectedAlternativeId === alternative.id
 
           return (
             <button
               key={alternative.id}
               type="button"
-              onClick={() => setSelectedAnswer(alternative.id)}
+              onClick={() => setSelectedAlternativeId(alternative.id)}
               style={{
                 ...styles.choiceButton,
                 border: isSelected ? "2px solid black" : "1px solid #ccc",
@@ -156,11 +147,11 @@ export default function Question42() {
       <button
         type="button"
         onClick={handleCheck}
-        disabled={!selectedAnswer}
+        disabled={!selectedAlternativeId}
         style={{
           ...styles.actionButton,
-          background: selectedAnswer ? "white" : "#f5f5f5",
-          cursor: selectedAnswer ? "pointer" : "not-allowed",
+          background: selectedAlternativeId ? "white" : "#f5f5f5",
+          cursor: selectedAlternativeId ? "pointer" : "not-allowed",
         }}
       >
         Check
