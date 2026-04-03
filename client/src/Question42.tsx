@@ -1,29 +1,75 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
-type Choice = {
+type Alternative = {
   id: string
   label: string
 }
 
-const choices: Choice[] = [
-  { id: "a", label: "101010" },
-  { id: "b", label: "100101" },
-  { id: "c", label: "110010" },
-  { id: "d", label: "111000" },
-]
+type Question = {
+  id: number
+  statement: string
+  alternatives: Alternative[]
+}
 
-const questionText = "Convert 42 (decimal) to binary:"
-const correctAnswer = "101010"
+type AnswerResult = {
+  questionId: number
+  selected: string
+  correct: boolean
+}
 
-type ScreenState = "question" | "correct" | "notQuite"
+type ScreenState = "loading" | "question" | "correct" | "notQuite" | "error"
 
 export default function Question42() {
+  const [question, setQuestion] = useState<Question | null>(null)
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
-  const [screenState, setScreenState] = useState<ScreenState>("question")
+  const [screenState, setScreenState] = useState<ScreenState>("loading")
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  function handleCheck() {
-    if (!selectedAnswer) return
-    setScreenState(selectedAnswer === correctAnswer ? "correct" : "notQuite")
+  useEffect(() => {
+    async function loadQuestion() {
+      try {
+        const response = await fetch("/question/42")
+
+        if (!response.ok) {
+          throw new Error(`Failed to load question: ${response.status}`)
+        }
+
+        const data: Question = await response.json()
+        setQuestion(data)
+        setScreenState("question")
+      } catch (error) {
+        console.error("Error loading question", error)
+        setErrorMessage("Could not load question.")
+        setScreenState("error")
+      }
+    }
+
+    loadQuestion()
+  }, [])
+
+  async function handleCheck() {
+    if (!selectedAnswer || !question) return
+
+    try {
+      const response = await fetch(`/question/${question.id}/answer`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ answer: selectedAnswer }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Failed to validate answer: ${response.status}`)
+      }
+
+      const result: AnswerResult = await response.json()
+      setScreenState(result.correct ? "correct" : "notQuite")
+    } catch (error) {
+      console.error("Error validating answer", error)
+      setErrorMessage("Could not validate answer.")
+      setScreenState("error")
+    }
   }
 
   function handleContinue() {
@@ -31,11 +77,35 @@ export default function Question42() {
     setScreenState("question")
   }
 
+  if (screenState === "loading") {
+    return (
+      <main style={styles.main}>
+        <h1>Loading...</h1>
+      </main>
+    )
+  }
+
+  if (screenState === "error") {
+    return (
+      <main style={styles.main}>
+        <h1>Error</h1>
+        <p>{errorMessage}</p>
+      </main>
+    )
+  }
+
+  if (!question) {
+    return null
+  }
+
   if (screenState === "correct") {
+    const selectedLabel =
+      question.alternatives.find((alternative) => alternative.id === selectedAnswer)?.label ?? ""
+
     return (
       <main style={styles.main}>
         <h1>Correct!</h1>
-        <p>42 in binary is 101010.</p>
+        <p>{question.id} in binary is {selectedLabel}.</p>
 
         <button type="button" onClick={handleContinue} style={styles.actionButton}>
           Continue
@@ -49,7 +119,6 @@ export default function Question42() {
       <main style={styles.main}>
         <h1>Not quite!</h1>
         <p>Almost there.</p>
-        <p>Correct answer is: 42 in binary is 101010.</p>
 
         <button type="button" onClick={handleContinue} style={styles.actionButton}>
           Continue
@@ -61,24 +130,24 @@ export default function Question42() {
   return (
     <main style={styles.main}>
       <h1>Question</h1>
-      <p>{questionText}</p>
+      <p>{question.statement}</p>
 
       <div style={styles.choicesGrid}>
-        {choices.map((choice) => {
-          const isSelected = selectedAnswer === choice.label
+        {question.alternatives.map((alternative) => {
+          const isSelected = selectedAnswer === alternative.id
 
           return (
             <button
-              key={choice.id}
+              key={alternative.id}
               type="button"
-              onClick={() => setSelectedAnswer(choice.label)}
+              onClick={() => setSelectedAnswer(alternative.id)}
               style={{
                 ...styles.choiceButton,
                 border: isSelected ? "2px solid black" : "1px solid #ccc",
                 background: isSelected ? "#f0f0f0" : "white",
               }}
             >
-              {choice.label}
+              {alternative.label}
             </button>
           )
         })}
@@ -106,6 +175,7 @@ const styles = {
     margin: "0 auto",
     padding: "24px",
     textAlign: "center" as const,
+    color: "white",
   },
   choicesGrid: {
     display: "grid",
@@ -118,6 +188,9 @@ const styles = {
     padding: "12px",
     borderRadius: "8px",
     cursor: "pointer",
+    color: "black",
+    background: "white",
+    border: "1px solid #ccc",
   },
   actionButton: {
     marginTop: "16px",
@@ -125,6 +198,7 @@ const styles = {
     border: "1px solid #ccc",
     borderRadius: "8px",
     background: "white",
+    color: "black",
     cursor: "pointer",
   },
 }
