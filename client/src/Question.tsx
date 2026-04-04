@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { logger } from "./logger"
 
 import type { AnswerResult, AnswerSubmission, Question } from "./types"
 
@@ -10,26 +11,33 @@ export default function Question() {
   const [screenState, setScreenState] = useState<ScreenState>("loading")
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  useEffect(() => {
-    async function loadQuestion() {
-      try {
-        const response = await fetch(`/question`)
+  async function loadQuestion() {
+    try {
+      setScreenState("loading")
 
-        if (!response.ok) {
-          throw new Error(`Failed to load question: ${response.status}`)
-        }
-        console.log("Loading question")
-        const data: Question = await response.json()
-        setQuestion(data)
-        setErrorMessage(null)
-        setScreenState("question")
-      } catch (error) {
-        console.error("Error loading question", error)
-        setErrorMessage("Could not load question.")
-        setScreenState("error")
+      const response = await fetch(`/question`)
+
+      if (!response.ok) {
+        throw new Error(`Failed to load question: ${response.status}`)
       }
-    }
 
+      console.log("Loading question")
+      const data: Question = await response.json()
+
+      logger.debug("[BODUHA][CLIENT] Received question:", data)
+      
+      setQuestion(data)
+      setSelectedAlternativeId(null)
+      setErrorMessage(null)
+      setScreenState("question")
+    } catch (error) {
+      console.error("Error loading question", error)
+      setErrorMessage("Could not load question.")
+      setScreenState("error")
+    }
+  }
+
+  useEffect(() => {
     loadQuestion()
   }, [])
 
@@ -43,7 +51,7 @@ export default function Question() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(submission)
+        body: JSON.stringify(submission),
       })
 
       if (!response.ok) {
@@ -59,9 +67,8 @@ export default function Question() {
     }
   }
 
-  function handleContinue() {
-    setSelectedAlternativeId(null)
-    setScreenState("question")
+  async function handleContinue() {
+    await loadQuestion()
   }
 
   if (screenState === "loading") {
