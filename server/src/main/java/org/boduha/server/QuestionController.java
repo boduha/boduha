@@ -1,6 +1,6 @@
 package org.boduha.server;
 
-import java.util.List;
+import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,7 @@ public class QuestionController {
             HttpSession session) {
 
         if (state == null) {
-            state = new UserState(List.of(13, 45, 189, 588, 1024, 3089, 4034, 58, 113));
+            state = new UserState(IntStream.range(0, 16).boxed().toList());
             session.setAttribute("state", state);
         }
 

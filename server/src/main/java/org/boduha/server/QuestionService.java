@@ -13,15 +13,35 @@ import org.springframework.stereotype.Service;
 public class QuestionService {
 
     private final Random random = new Random();
+    private int questionCount = 0;
 
-    public Question nextQuestion(UserState state) {
-        int number = state.nextNumber();
+    public synchronized Question nextQuestion(UserState state) {
+        questionCount++;
 
-        return new Question(
-                number,
-                QuestionType.PLAIN,
-                "Convert " + number + " (decimal) to binary:",
-                generateAlternatives(number, state));
+        if (questionCount % 4 == 0) {
+            // SEND TABLE!
+            state.setCorrectAnswerId("a");
+
+            return new Question(
+                    1000 + questionCount,
+                    QuestionType.TABLE,
+                    "Follow the pattern",
+                    List.of(new Alternative("a", "1000"),
+                            new Alternative("b", "0111")),
+                    List.of(new Question.TableRow("2", "10"),
+                            new Question.TableRow("4", "100"),
+                            new Question.TableRow("8", "?")));
+
+        } else {
+            // SEND PLAIN!
+            int number = state.nextNumber();
+
+            return new Question(
+                    number,
+                    QuestionType.PLAIN,
+                    "Convert from decimal to binary",
+                    generateAlternatives(number, state), null);
+        }
     }
 
     private List<Alternative> generateAlternatives(int number, UserState state) {
