@@ -10,7 +10,7 @@ public class UserState {
     private List<Integer> remaining;
     private final List<Integer> originalValues;
     private final Random random;
-    private String correctAnswerId;
+    private Alternative correctAlternative;
 
     public UserState(List<Integer> values) {
         this(values, new Random());
@@ -44,12 +44,12 @@ public class UserState {
         return remaining.remove(0);
     }
 
-    public String getCorrectAnswerId() {
-        return correctAnswerId;
+    public Alternative getCorrectAlternative() {
+        return correctAlternative;
     }
 
-    public void setCorrectAnswerId(String correctAnswerId) {
-        this.correctAnswerId = correctAnswerId;
+    public void setCorrectAlternative(Alternative correctAlternative) {
+        this.correctAlternative = correctAlternative;
     }
 
     public int remainingCount() {
@@ -61,4 +61,5 @@ public class UserState {
         Collections.shuffle(shuffled, random);
         return shuffled;
     }
+
 }

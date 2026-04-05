@@ -7,6 +7,8 @@ type ScreenState = "loading" | "question" | "correct" | "notQuite" | "error"
 
 export default function Question() {
   const [question, setQuestion] = useState<Question | null>(null)
+  const [answerResult, setAnswerResult] = useState<AnswerResult | null>(null)
+
   const [selectedAlternativeId, setSelectedAlternativeId] = useState<string | null>(null)
   const [screenState, setScreenState] = useState<ScreenState>("loading")
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -29,6 +31,7 @@ export default function Question() {
       setQuestion(data)
       setSelectedAlternativeId(null)
       setErrorMessage(null)
+      setAnswerResult(null)
       setScreenState("question")
     } catch (error) {
       logger.error("Error loading question", error)
@@ -59,6 +62,7 @@ export default function Question() {
       }
 
       const result: AnswerResult = await response.json()
+      setAnswerResult(result)
       setScreenState(result.correct ? "correct" : "notQuite")
     } catch (error) {
       logger.error("Error validating answer", error)
@@ -106,7 +110,7 @@ export default function Question() {
           <div style={styles.feedbackPanelCorrect}>
             <h1 style={styles.feedbackTitle}>Correct!</h1>
             <p style={styles.feedbackText}>
-              {question.id} in binary is <strong>{selectedLabel}</strong>.
+              {question.value}<sub style={{ fontSize: "8px", color: "red" }}>10</sub> in binary is <strong>{selectedLabel}<sub style={{ fontSize: "8px", color: "red" }}>2</sub></strong>.
             </p>
           </div>
         </section>
@@ -135,21 +139,23 @@ export default function Question() {
         <section style={styles.centeredState}>
           <div style={styles.feedbackPanelNotQuite}>
             <h1 style={styles.feedbackTitle}>Not quite!</h1>
-            <p style={styles.feedbackText}>Almost there.</p>
+            <p style={styles.feedbackText}>
+              {question.value}<sub style={{ fontSize: "8px", color: "red" }}>10</sub> in binary is <strong>{answerResult?.correctAlternative.label}<sub style={{ fontSize: "8px", color: "red" }}>2</sub></strong>.
+            </p>
           </div>
         </section>
 
         <div style={styles.inner}>
           <div style={styles.bottomBarInner}></div>
-        <section style={styles.bottomBar}>
-          <div style={styles.bottomBarInner}>
-            <button type="button" onClick={handleContinue} style={styles.primaryButton}>
-              Continue
-            </button>
-          </div>
+          <section style={styles.bottomBar}>
+            <div style={styles.bottomBarInner}>
+              <button type="button" onClick={handleContinue} style={styles.primaryButton}>
+                Continue
+              </button>
+            </div>
 
-        </section>
-          </div>
+          </section>
+        </div>
 
       </main>
     )
@@ -171,7 +177,7 @@ export default function Question() {
           </div>
 
           {question.type === "PLAIN" && (
-            <p style={styles.expression}>{question.id} = ?</p>
+            <p style={styles.expression}>{question.value} = ?</p>
           )}
 
           {question.type === "TABLE" && question.rows && (

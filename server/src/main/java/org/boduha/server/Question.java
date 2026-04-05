@@ -4,6 +4,7 @@ import java.util.List;
 
 public record Question(
         Integer id,
+        Integer value,
         QuestionType type,
         String statement,
         List<Alternative> alternatives,

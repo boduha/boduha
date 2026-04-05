@@ -45,8 +45,8 @@ public class QuestionController {
             @RequestBody AnswerSubmission submission,
             @SessionAttribute(name = "state") UserState state) {
 
-        boolean correct = submission.answer().equals(state.getCorrectAnswerId());
+        boolean correct = submission.answer().equals(state.getCorrectAlternative().id());
 
-        return new AnswerResult(id, submission.answer(), correct);
+        return new AnswerResult(id, submission.answer(), correct, state.getCorrectAlternative());
     }
 }

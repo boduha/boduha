@@ -11,6 +11,7 @@ export type QuestionType = "PLAIN" | "TABLE"
 
 export type Question = {
   id: number
+  value: number
   type: QuestionType
   statement: string
   alternatives: Alternative[]
@@ -25,4 +26,5 @@ export type AnswerResult = {
   questionId: number
   selected: string
   correct: boolean
+  correctAlternative : Alternative
 }

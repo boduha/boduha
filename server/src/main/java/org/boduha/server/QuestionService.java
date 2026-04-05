@@ -20,10 +20,11 @@ public class QuestionService {
 
         if (questionCount % 4 == 0) {
             // SEND TABLE!
-            state.setCorrectAnswerId("a");
+            state.setCorrectAlternative(new Alternative("a", "1000"));
 
             return new Question(
                     1000 + questionCount,
+                    8,
                     QuestionType.TABLE,
                     "Follow the pattern",
                     List.of(new Alternative("a", "1000"),
@@ -37,6 +38,7 @@ public class QuestionService {
             int number = state.nextNumber();
 
             return new Question(
+                    number,
                     number,
                     QuestionType.PLAIN,
                     "Convert from decimal to binary",
@@ -92,7 +94,7 @@ public class QuestionService {
             result.add(new Alternative(alternativeId, value));
 
             if (value.equals(correct)) {
-                state.setCorrectAnswerId(alternativeId);
+                state.setCorrectAlternative(new Alternative(alternativeId, value));
             }
         }
 
