@@ -3,13 +3,18 @@ export type Alternative = {
   label: string
 }
 
-export type QuestionType = "CONVERT" | "TABLE"
+export type TableRow = {
+  left: string
+  right: string
+}
+export type QuestionType = "PLAIN" | "TABLE"
 
 export type Question = {
   id: number
   type: QuestionType
   statement: string
   alternatives: Alternative[]
+  rows: TableRow[] | null
 }
 
 export type AnswerSubmission = {
