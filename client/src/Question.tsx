@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react"
+import Button from '@mui/material/Button'
+
 import { logger } from "./logger"
 
 import type { AnswerResult, AnswerSubmission, Question } from "./types"
@@ -197,17 +199,25 @@ export default function Question() {
               const isSelected = selectedAlternativeId === alternative.id
 
               return (
-                <button
+                <Button
+                  disableRipple
+  disableFocusRipple
                   key={alternative.id}
-                  type="button"
+                  variant={isSelected ? "contained" : "outlined"}
+                    color={isSelected ? "primary" : "inherit"}
+
+                  fullWidth
                   onClick={() => setSelectedAlternativeId(alternative.id)}
-                  style={{
-                    ...styles.choiceButton,
-                    ...(isSelected ? styles.choiceButtonSelected : {}),
-                  }}
+                  sx={{
+  height: "64px",
+  fontSize: "1.5rem",
+  borderRadius: "12px",
+  textTransform: "none",
+  boxShadow: isSelected ? 3 : 1,
+}}
                 >
                   {alternative.label}
-                </button>
+                </Button>
               )
             })}
           </div>
