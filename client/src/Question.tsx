@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import Button from '@mui/material/Button'
+import Alert from '@mui/material/Alert'
 
 import { logger } from "./logger"
 
@@ -102,38 +103,7 @@ export default function Question() {
     return null
   }
 
-  if (screenState === "correct") {
-    const selectedLabel =
-      question.alternatives.find((alternative) => alternative.id === selectedAlternativeId)?.label ?? ""
 
-    return (
-      <main style={styles.main}>
-        <section style={styles.centeredState}>
-          <div style={styles.feedbackPanelCorrect}>
-            <h1 style={styles.feedbackTitle}>Correct!</h1>
-            <p style={styles.feedbackText}>
-              {question.value}<sub style={{ fontSize: "8px", color: "red" }}>10</sub> in binary is <strong>{selectedLabel}<sub style={{ fontSize: "8px", color: "red" }}>2</sub></strong>.
-            </p>
-          </div>
-        </section>
-        <div style={styles.separator} />
-
-        <div style={styles.inner}>
-          <div style={styles.bottomBarInner}></div>
-          <section style={styles.bottomBar}>
-            <div style={styles.bottomBarInner}>
-
-              <button type="button" onClick={handleContinue} style={styles.primaryButton}>
-                Continue
-              </button>
-            </div>
-
-          </section>
-        </div>
-
-      </main>
-    )
-  }
 
   if (screenState === "notQuite") {
     return (
@@ -230,7 +200,34 @@ export default function Question() {
         </div>
 
       </section>
+{screenState === "correct" && (
+  <div style={styles.overlay}>
+    <Alert severity="success" style={styles.floatingPanel}>
+          <h1 style={styles.feedbackTitle}>Correct!</h1>
+          <p style={styles.feedbackText}>
+            {question.value}
+            <sub style={{ fontSize: "8px", color: "red" }}>10</sub>
+            {" "}in binary is{" "}
+            <strong>
+              {answerResult.correctAlternative.label}
+              <sub style={{ fontSize: "8px", color: "red" }}>2</sub>
+            </strong>.
+          </p>
+          <div style={styles.actions}>
 
+          <Button variant="contained" onClick={handleContinue}
+              style={styles.primaryButton}
+
+          >
+            Continue
+          </Button>
+          </div>
+    </Alert>
+
+  </div>
+)}
+
+ 
       <section style={styles.bottomBar}>
         <div style={styles.separator} />
 
@@ -265,6 +262,7 @@ const styles = {
     flexDirection: "column" as const,
     boxSizing: "border-box" as const,
     color: "inherit",
+    position: "relative",
   },
   inner: {
     width: "100%",
@@ -419,6 +417,11 @@ const styles = {
     color: "#1cb0f6",
     fontWeight: 700,
   },
+    actions: {
+    marginTop: "12px",
+    display: "flex",
+    justifyContent: "flex-start", // or "center" or "stretch"
+  },
   table: {
     margin: "0 auto 32px",
     borderCollapse: "collapse" as const,
@@ -430,5 +433,22 @@ const styles = {
     fontSize: "24px",
     fontWeight: 600,
     textAlign: "center" as const,
+  },
+    overlay: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+    pointerEvents: "none", // allows background to stay visible
+  },
+
+  floatingPanel: {
+    width: "100%",
+    maxWidth: "640px",
+    margin: "16px",
+    pointerEvents: "auto", // re-enable clicks inside panel
+    boxShadow: "0 -4px 16px rgba(0,0,0,0.2)",
   },
 }
