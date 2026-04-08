@@ -197,24 +197,30 @@ export default function Question() {
           <div style={styles.choicesGrid}>
             {question.alternatives.map((alternative) => {
               const isSelected = selectedAlternativeId === alternative.id
-
               return (
                 <Button
                   disableRipple
-  disableFocusRipple
+                  disableFocusRipple
                   key={alternative.id}
                   variant={isSelected ? "contained" : "outlined"}
-                    color={isSelected ? "primary" : "inherit"}
+                  color={isSelected ? "primary" : "inherit"}
 
                   fullWidth
-                  onClick={() => setSelectedAlternativeId(alternative.id)}
+                  //onClick={() => setSelectedAlternativeId(alternative.id)}
+                  onClick={() => {
+                    const clickSound = new Audio("/sounds/tap.mp3")
+
+                    clickSound.currentTime = 0
+                    clickSound.play()
+                    setSelectedAlternativeId(alternative.id)
+                  }}
                   sx={{
-  height: "64px",
-  fontSize: "1.5rem",
-  borderRadius: "12px",
-  textTransform: "none",
-  boxShadow: isSelected ? 3 : 1,
-}}
+                    height: "64px",
+                    fontSize: "1.5rem",
+                    borderRadius: "12px",
+                    textTransform: "none",
+                    boxShadow: isSelected ? 3 : 1,
+                  }}
                 >
                   {alternative.label}
                 </Button>
@@ -304,7 +310,8 @@ const styles = {
   },
   choicesGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(2, minmax(180px, 1fr))",
+    //gridTemplateColumns: "repeat(2, minmax(180px, 1fr))",
+    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
     gap: "16px",
     width: "100%",
     maxWidth: "620px",
