@@ -103,8 +103,6 @@ export default function Question() {
     return null
   }
 
-
-
   if (screenState === "notQuite") {
     return (
       <main style={styles.main}>
@@ -112,7 +110,7 @@ export default function Question() {
           <div style={styles.feedbackPanelNotQuite}>
             <h1 style={styles.feedbackTitle}>Not quite!</h1>
             <p style={styles.feedbackText}>
-              {question.value}<sub style={{ fontSize: "8px", color: "red" }}>10</sub> in binary is <strong>{answerResult?.correctAlternative.label}<sub style={{ fontSize: "8px", color: "red" }}>2</sub></strong>.
+              {question.value}<sub style={{ fontSize: "8px" }}>10</sub> in binary is <strong>{answerResult?.correctAlternative.label}<sub style={{ fontSize: "8px" }}>2</sub></strong>.
             </p>
           </div>
         </section>
@@ -200,55 +198,57 @@ export default function Question() {
         </div>
 
       </section>
-{screenState === "correct" && (
-  <div style={styles.overlay}>
-    <Alert severity="success" style={styles.floatingPanel}>
-          <h1 style={styles.feedbackTitle}>Correct!</h1>
-          <p style={styles.feedbackText}>
-            {question.value}
-            <sub style={{ fontSize: "8px", color: "red" }}>10</sub>
-            {" "}in binary is{" "}
-            <strong>
-              {answerResult.correctAlternative.label}
-              <sub style={{ fontSize: "8px", color: "red" }}>2</sub>
-            </strong>.
-          </p>
-          <div style={styles.actions}>
 
-          <Button variant="contained" onClick={handleContinue}
-              style={styles.primaryButton}
-
-          >
-            Continue
-          </Button>
-          </div>
-    </Alert>
-
-  </div>
-)}
-
- 
       <section style={styles.bottomBar}>
-        <div style={styles.separator} />
 
-        <div style={styles.inner}>
-          <div style={styles.bottomBarInner}>
 
-            <button
-              type="button"
-              onClick={handleCheck}
-              disabled={!selectedAlternativeId}
-              style={{
-                ...styles.primaryButton,
-                ...(selectedAlternativeId ? {} : styles.primaryButtonDisabled),
-              }}
-            >
-              Check
-            </button>
+        {screenState === "correct" && (
+          <div style={styles.inner}>
+            <h1 style={styles.feedbackTitle}>Correct!</h1>
+            <p style={styles.feedbackText}>
+              {question.value}
+              <sub style={{ fontSize: "8px" }}>10</sub>
+              {" "}in binary is{" "}
+              <strong>
+                {answerResult.correctAlternative.label}
+                <sub style={{ fontSize: "8px" }}>2</sub>
+              </strong>.
+            </p>
+            <div style={styles.separator} />
+            <div style={styles.bottomBarInner}>
+
+              <Button onClick={handleContinue}
+                style={styles.primaryButton}
+              >
+                Continue
+              </Button>
+            </div>
+
           </div>
+        )}
 
-        </div>
+        {screenState === "question" && (
+          <div style={styles.inner}>
+            <div style={styles.separator} />
+            <div style={styles.bottomBarInner}>
+
+              <Button
+                onClick={handleCheck}
+                disabled={!selectedAlternativeId}
+                style={{
+                  ...styles.primaryButton,
+                  ...(selectedAlternativeId ? {} : styles.primaryButtonDisabled),
+                }}
+              >
+                Check
+              </Button>
+            </div>
+          </div>
+        )}
+
+
       </section>
+
     </main>
   )
 }
@@ -308,7 +308,6 @@ const styles = {
   },
   choicesGrid: {
     display: "grid",
-    //gridTemplateColumns: "repeat(2, minmax(180px, 1fr))",
     gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
     gap: "16px",
     width: "100%",
@@ -327,6 +326,8 @@ const styles = {
     fontWeight: 600,
     transition: "background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease",
     boxSizing: "border-box" as const,
+    WebkitUserSelect: "none" as const,
+    WebkitTouchCallout: "none" as const,
   },
   choiceButtonSelected: {
     borderColor: "#7cc9ff",
@@ -341,7 +342,7 @@ const styles = {
     display: "flex",
     flexDirection: "column" as const,
     alignItems: "stretch",
-    backgroundColor: "#ffffff", // 👈 subtle surface
+    //backgroundColor: "#ffffff", // 👈 subtle surface
   },
   separator: {
     width: "100%",
@@ -417,7 +418,7 @@ const styles = {
     color: "#1cb0f6",
     fontWeight: 700,
   },
-    actions: {
+  actions: {
     marginTop: "12px",
     display: "flex",
     justifyContent: "flex-start", // or "center" or "stretch"
@@ -426,7 +427,6 @@ const styles = {
     margin: "0 auto 32px",
     borderCollapse: "collapse" as const,
   },
-
   cell: {
     padding: "12px 24px",
     border: "1px solid #e5e7eb",
@@ -434,7 +434,7 @@ const styles = {
     fontWeight: 600,
     textAlign: "center" as const,
   },
-    overlay: {
+  overlay: {
     position: "absolute",
     bottom: 0,
     left: 0,
@@ -443,12 +443,11 @@ const styles = {
     justifyContent: "center",
     pointerEvents: "none", // allows background to stay visible
   },
-
   floatingPanel: {
     width: "100%",
     maxWidth: "640px",
     margin: "16px",
     pointerEvents: "auto", // re-enable clicks inside panel
-    boxShadow: "0 -4px 16px rgba(0,0,0,0.2)",
+    //boxShadow: "0 -4px 16px rgba(0,0,0,0.2)",
   },
 }
