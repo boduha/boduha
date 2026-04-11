@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import Button from '@mui/material/Button'
-import Alert from '@mui/material/Alert'
+import { getNextQuestion, submitAnswer } from "./questionApi"
 
 import { logger } from "./logger"
 
@@ -21,13 +21,8 @@ export default function Question() {
       setScreenState("loading")
       logger.debug("[BODUHA][CLIENT] Loading question")
 
-      const response = await fetch(`/question`)
-
-      if (!response.ok) {
-        throw new Error(`Failed to load question: ${response.status}`)
-      }
-
-      const data: Question = await response.json()
+   
+      const data: Question = await getNextQuestion()
 
       logger.debug("[BODUHA][CLIENT] Received question:", data)
 
@@ -52,19 +47,8 @@ export default function Question() {
 
     try {
       const submission: AnswerSubmission = { answer: selectedAlternativeId }
-      const response = await fetch(`/question/${question.id}/answer`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(submission),
-      })
-
-      if (!response.ok) {
-        throw new Error(`Failed to validate answer: ${response.status}`)
-      }
-
-      const result: AnswerResult = await response.json()
+    
+      const result = await submitAnswer(question.id, submission)
       setAnswerResult(result)
       setScreenState(result.correct ? "correct" : "notQuite")
     } catch (error) {
