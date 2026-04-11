@@ -6,7 +6,13 @@ import { logger } from "./logger"
 
 import type { AnswerResult, AnswerSubmission, Question } from "./types"
 
-type ScreenState = "loading" | "question" | "correct" | "notQuite" | "error"
+type ScreenState =
+  | "loading"
+  | "question"
+  | "correct"
+  | "notQuite"
+  | "error"
+  | "sessionComplete"
 
 export default function Question() {
   const [question, setQuestion] = useState<Question | null>(null)
@@ -16,6 +22,7 @@ export default function Question() {
   const [selectedAlternativeId, setSelectedAlternativeId] = useState<string | null>(null)
   const [screenState, setScreenState] = useState<ScreenState>("loading")
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const SESSION_LENGTH = 8
 
   async function loadQuestion() {
     try {
@@ -94,9 +101,15 @@ export default function Question() {
   }
 
   async function handleContinue() {
+    if (answeredCount >= SESSION_LENGTH) {
+      setScreenState("sessionComplete")
+      return
+    }
+
     setScreenState("loading")
     await loadQuestion()
   }
+
 
   if (screenState === "error") {
     return (
@@ -140,7 +153,33 @@ export default function Question() {
       </main>
     )
   }
-
+  if (screenState === "sessionComplete") {
+    return (
+      <main style={styles.main}>
+        <section style={styles.centeredState}>
+          <h1 style={styles.feedbackTitle}>Session complete!</h1>
+          <p style={styles.feedbackText}>
+            You answered {SESSION_LENGTH} questions.
+          </p>
+          <button
+            type="button"
+            onClick={async () => {
+              setAnsweredCount(0)
+              setStreak(0)
+              setSelectedAlternativeId(null)
+              setAnswerResult(null)
+              setErrorMessage(null)
+              setScreenState("loading")
+              await loadQuestion()
+            }}
+            style={styles.primaryButton}
+          >
+            Restart
+          </button>
+        </section>
+      </main>
+    )
+  }
   const [ac, ...restParts] = question.statement.split(" ")
   const rest = restParts.join(" ")
 
@@ -149,10 +188,10 @@ export default function Question() {
 
       <section style={styles.content}>
         <div style={styles.inner}>
-<div style={styles.progressRow}>
-  <p style={styles.progressText}>Answered: {answeredCount}</p>
-  <p style={styles.progressText}>Streak: {streak}</p>
-</div>
+          <div style={styles.progressRow}>
+            <p style={styles.progressText}>Answered: {answeredCount}</p>
+            <p style={styles.progressText}>Streak: {streak}</p>
+          </div>
 
           <div style={styles.headerBlock}>
             <h1 style={styles.promptTitle}>
@@ -328,26 +367,6 @@ const styles = {
     maxWidth: "620px",
     margin: "0 auto",
   },
-  choiceButton: {
-    minHeight: "64px",
-    padding: "16px 20px",
-    borderRadius: "14px",
-    cursor: "pointer",
-    color: "#111827",
-    background: "white",
-    border: "2px solid #d1d5db",
-    fontSize: "28px",
-    fontWeight: 600,
-    transition: "background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease",
-    boxSizing: "border-box" as const,
-    WebkitUserSelect: "none" as const,
-    WebkitTouchCallout: "none" as const,
-  },
-  choiceButtonSelected: {
-    borderColor: "#7cc9ff",
-    background: "#eef8ff",
-    boxShadow: "0 0 0 1px #7cc9ff inset",
-  },
   bottomBar: {
     width: "100%",
     marginTop: "auto",
@@ -397,14 +416,7 @@ const styles = {
     color: "#24364d",
     textAlign: "center" as const,
   },
-  feedbackPanelCorrect: {
-    maxWidth: "560px",
-    margin: "0 auto 24px",
-    padding: "24px",
-    borderRadius: "16px",
-    background: "#ecfccb",
-    border: "1px solid #bef264",
-  },
+
   feedbackPanelNotQuite: {
     maxWidth: "560px",
     margin: "0 auto 24px",
@@ -432,11 +444,7 @@ const styles = {
     color: "#1cb0f6",
     fontWeight: 700,
   },
-  actions: {
-    marginTop: "12px",
-    display: "flex",
-    justifyContent: "flex-start", // or "center" or "stretch"
-  },
+
   table: {
     margin: "0 auto 32px",
     borderCollapse: "collapse" as const,
@@ -457,42 +465,18 @@ const styles = {
     justifyContent: "center",
     pointerEvents: "none", // allows background to stay visible
   },
-  floatingPanel: {
-    width: "100%",
-    maxWidth: "640px",
-    margin: "16px",
-    pointerEvents: "auto", // re-enable clicks inside panel
-    //boxShadow: "0 -4px 16px rgba(0,0,0,0.2)",
-  },
-  streak: {
-    margin: "0 auto 16px",
-    width: "100%",
-    maxWidth: "620px",
-    fontSize: "18px",
-    fontWeight: 700,
-    color: "#24364d",
-    textAlign: "left" as const,
-  },
   progressRow: {
-    margin: "0 auto 16px",
     width: "100%",
     maxWidth: "620px",
+    margin: "0 auto 24px",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
   },
-progressRow: {
-  width: "100%",
-  maxWidth: "620px",
-  margin: "0 auto 24px",
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-},
-progressText: {
-  margin: 0,
-  fontSize: "18px",
-  fontWeight: 700,
-  color: "#24364d",
-},
+  progressText: {
+    margin: 0,
+    fontSize: "18px",
+    fontWeight: 700,
+    color: "#24364d",
+  },
 }
