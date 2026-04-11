@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import Button from '@mui/material/Button'
+import Button from "@mui/material/Button"
 import { getNextQuestion, submitAnswer } from "./questionApi"
 
 import { logger } from "./logger"
@@ -18,10 +18,8 @@ export default function Question() {
 
   async function loadQuestion() {
     try {
-      setScreenState("loading")
       logger.debug("[BODUHA][CLIENT] Loading question")
 
-   
       const data: Question = await getNextQuestion()
 
       logger.debug("[BODUHA][CLIENT] Received question:", data)
@@ -39,7 +37,37 @@ export default function Question() {
   }
 
   useEffect(() => {
-    loadQuestion()
+    let cancelled = false
+
+    async function loadInitialQuestion() {
+      try {
+        logger.debug("[BODUHA][CLIENT] Loading question")
+
+        const data: Question = await getNextQuestion()
+
+        if (cancelled) return
+
+        logger.debug("[BODUHA][CLIENT] Received question:", data)
+
+        setQuestion(data)
+        setSelectedAlternativeId(null)
+        setErrorMessage(null)
+        setAnswerResult(null)
+        setScreenState("question")
+      } catch (error) {
+        if (cancelled) return
+
+        logger.error("Error loading question", error)
+        setErrorMessage("Could not load question.")
+        setScreenState("error")
+      }
+    }
+
+    void loadInitialQuestion()
+
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   async function handleCheck() {
@@ -47,7 +75,7 @@ export default function Question() {
 
     try {
       const submission: AnswerSubmission = { answer: selectedAlternativeId }
-    
+
       const result = await submitAnswer(question.id, submission)
       setAnswerResult(result)
       setScreenState(result.correct ? "correct" : "notQuite")
@@ -59,6 +87,7 @@ export default function Question() {
   }
 
   async function handleContinue() {
+    setScreenState("loading")
     await loadQuestion()
   }
 
