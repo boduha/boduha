@@ -11,7 +11,8 @@ type ScreenState = "loading" | "question" | "correct" | "notQuite" | "error"
 export default function Question() {
   const [question, setQuestion] = useState<Question | null>(null)
   const [answerResult, setAnswerResult] = useState<AnswerResult | null>(null)
-
+  const [streak, setStreak] = useState(0)
+  const [answeredCount, setAnsweredCount] = useState(0)
   const [selectedAlternativeId, setSelectedAlternativeId] = useState<string | null>(null)
   const [screenState, setScreenState] = useState<ScreenState>("loading")
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -78,6 +79,12 @@ export default function Question() {
 
       const result = await submitAnswer(question.id, submission)
       setAnswerResult(result)
+      if (result.correct) {
+        setStreak((current) => current + 1)
+      } else {
+        setStreak(0)
+      }
+      setAnsweredCount((current) => current + 1)
       setScreenState(result.correct ? "correct" : "notQuite")
     } catch (error) {
       logger.error("Error validating answer", error)
@@ -89,16 +96,6 @@ export default function Question() {
   async function handleContinue() {
     setScreenState("loading")
     await loadQuestion()
-  }
-
-  if (screenState === "loading") {
-    return (
-      <main style={styles.main}>
-        <section style={styles.centeredState}>
-          <h1 style={styles.statusTitle}>Loading...</h1>
-        </section>
-      </main>
-    )
   }
 
   if (screenState === "error") {
@@ -152,6 +149,10 @@ export default function Question() {
 
       <section style={styles.content}>
         <div style={styles.inner}>
+<div style={styles.progressRow}>
+  <p style={styles.progressText}>Answered: {answeredCount}</p>
+  <p style={styles.progressText}>Streak: {streak}</p>
+</div>
 
           <div style={styles.headerBlock}>
             <h1 style={styles.promptTitle}>
@@ -463,4 +464,35 @@ const styles = {
     pointerEvents: "auto", // re-enable clicks inside panel
     //boxShadow: "0 -4px 16px rgba(0,0,0,0.2)",
   },
+  streak: {
+    margin: "0 auto 16px",
+    width: "100%",
+    maxWidth: "620px",
+    fontSize: "18px",
+    fontWeight: 700,
+    color: "#24364d",
+    textAlign: "left" as const,
+  },
+  progressRow: {
+    margin: "0 auto 16px",
+    width: "100%",
+    maxWidth: "620px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+progressRow: {
+  width: "100%",
+  maxWidth: "620px",
+  margin: "0 auto 24px",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+},
+progressText: {
+  margin: 0,
+  fontSize: "18px",
+  fontWeight: 700,
+  color: "#24364d",
+},
 }
