@@ -1,11 +1,10 @@
-import './BoduhaApp.css'
 import { Routes, Route } from 'react-router-dom'
-import Question from './Question'
+import QuestionPage from './QuestionPage'
 
 export default function BoduhaApp() {
   return (
     <Routes>
-      <Route path="/" element={<Question />} />
+      <Route path="/" element={<QuestionPage />} />
     </Routes>
   )
 }

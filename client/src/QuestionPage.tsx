@@ -15,7 +15,7 @@ type ScreenState =
   | "error"
   | "sessionComplete"
 
-export default function Question() {
+export default function QuestionPage() {
   const theme = useTheme()
   const isDark = theme.palette.mode === "dark"
 
@@ -92,6 +92,7 @@ export default function Question() {
         fontWeight: 700,
         color: palette.primaryText,
         textAlign: "left" as const,
+        fontFamily: "Buenard, serif",
       },
       expression: {
         margin: "0 0 44px",
@@ -100,6 +101,7 @@ export default function Question() {
         fontWeight: 700,
         color: palette.primaryText,
         textAlign: "center" as const,
+        fontFamily: "Buenard, serif",
       },
       choicesGrid: {
         display: "grid",
@@ -123,6 +125,8 @@ export default function Question() {
         height: "2px",
         backgroundColor: palette.line,
         marginBottom: "20px",
+        marginTop: "32px",
+
       },
       bottomBarInner: {
         width: "100%",
@@ -172,6 +176,7 @@ export default function Question() {
         fontWeight: 800,
         color: palette.successTitle,
         textAlign: "center" as const,
+        fontFamily: "Buenard, serif",
       },
       feedbackTitleWarning: {
         margin: "0 0 12px",
@@ -180,6 +185,8 @@ export default function Question() {
         fontWeight: 800,
         color: palette.warningTitle,
         textAlign: "center" as const,
+        fontFamily: "Buenard, serif",
+
       },
       feedbackText: {
         margin: 0,
@@ -187,6 +194,8 @@ export default function Question() {
         lineHeight: 1.4,
         color: palette.primaryText,
         textAlign: "center" as const,
+        fontFamily: "Buenard, serif",
+
       },
       action: {
         color: palette.accentBlue,
@@ -195,10 +204,13 @@ export default function Question() {
       table: {
         margin: "0 auto 32px",
         borderCollapse: "collapse" as const,
+        fontFamily: "Buenard, serif",
+        borderTop: `2px solid ${palette.tableBorder}`,
       },
       cell: {
         padding: "12px 24px",
-        border: `1px solid ${palette.tableBorder}`,
+        border: "none",
+
         fontSize: "24px",
         fontWeight: 600,
         textAlign: "center" as const,
@@ -413,9 +425,21 @@ export default function Question() {
             <table style={styles.table}>
               <tbody>
                 {question.rows.map((row, index) => (
-                  <tr key={index}>
+                  <tr key={index}
+                    style={{
+                      borderTop: `1px solid ${palette.tableBorder}`,
+                      borderBottom: `1px solid ${palette.tableBorder}`,
+                    }}
+                  >
                     <td style={styles.cell}>{row.left}</td>
-                    <td style={styles.cell}>{row.right}</td>
+                    <td
+                      style={{
+                        ...styles.cell,
+                        borderLeft: `1px solid ${palette.tableBorder}`,
+                      }}
+                    >
+                      {row.right}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -425,6 +449,7 @@ export default function Question() {
           <div style={styles.choicesGrid}>
             {question.alternatives.map((alternative) => {
               const isSelected = selectedAlternativeId === alternative.id
+              const becomesTradition = screenState === "correct" && isSelected
 
               return (
                 <Button
@@ -441,15 +466,16 @@ export default function Question() {
                   sx={{
                     height: "64px",
                     fontSize: "1.5rem",
-                    fontWeight: 500,
+                    fontWeight: becomesTradition ? 700 : 500,
+                    fontFamily: becomesTradition ? "Buenard, serif" : "system-ui, sans-serif",
+                    opacity: screenState === "correct" && !isSelected ? 0.6 : 1,
                     borderRadius: "16px",
                     textTransform: "none",
                     boxShadow: "none",
                     backgroundColor: isSelected ? palette.choiceSelectedBg : palette.choiceBg,
                     color: isSelected ? palette.choiceSelectedText : palette.choiceText,
-                    border: `2px solid ${
-                      isSelected ? palette.choiceSelectedBorder : palette.choiceBorder
-                    }`,
+                    border: `2px solid ${isSelected ? palette.choiceSelectedBorder : palette.choiceBorder
+                      }`,
                     "&:hover": {
                       backgroundColor: isSelected ? palette.choiceSelectedBg : palette.choiceBg,
                       boxShadow: "none",
