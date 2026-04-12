@@ -19,31 +19,37 @@ public class QuestionService {
         questionCount++;
 
         if (questionCount % 4 == 0) {
-            // SEND TABLE!
-            state.setCorrectAlternative(new Alternative("a", "1000"));
-
-            return new Question(
-                    1000 + questionCount,
-                    8,
-                    QuestionType.TABLE,
-                    "Follow the pattern",
-                    List.of(new Alternative("a", "1000"),
-                            new Alternative("b", "0111")),
-                    List.of(new Question.TableRow("2", "10"),
-                            new Question.TableRow("4", "100"),
-                            new Question.TableRow("8", "?")));
-
-        } else {
-            // SEND PLAIN!
-            int number = state.nextNumber();
-
-            return new Question(
-                    number,
-                    number,
-                    QuestionType.PLAIN,
-                    "Convert from decimal to binary",
-                    generateAlternatives(number, state), null);
+            return generateTableQuestion(state);
         }
+
+        return generatePlainQuestion(state);
+    }
+
+    private Question generatePlainQuestion(UserState state) {
+        int number = state.nextNumber();
+
+        return new Question(
+                number,
+                number,
+                QuestionType.PLAIN,
+                "Convert from decimal to binary",
+                generateAlternatives(number, state),
+                null);
+    }
+
+    private Question generateTableQuestion(UserState state) {
+        state.setCorrectAlternative(new Alternative("a", "1000"));
+
+        return new Question(
+                1000 + questionCount,
+                8,
+                QuestionType.TABLE,
+                "Follow the pattern",
+                List.of(new Alternative("a", "1000"),
+                        new Alternative("b", "0111")),
+                List.of(new Question.TableRow("2", "10"),
+                        new Question.TableRow("4", "100"),
+                        new Question.TableRow("8", "?")));
     }
 
     private List<Alternative> generateAlternatives(int number, UserState state) {
