@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import Button from "@mui/material/Button"
+import ActionButton from "./components/ActionButton"
 import { useTheme } from "@mui/material/styles"
 import { getNextQuestion, submitAnswer } from "./questionApi"
 
@@ -132,26 +133,6 @@ export default function QuestionPage() {
         width: "100%",
         display: "flex",
         justifyContent: "flex-end",
-      },
-      primaryButton: {
-        minWidth: "180px",
-        minHeight: "56px",
-        padding: "14px 28px",
-        border: "none",
-        borderRadius: "16px",
-        background: palette.successBg,
-        color: palette.successText,
-        fontSize: "22px",
-        fontWeight: 800,
-        cursor: "pointer",
-        boxShadow: `0 4px 0 ${palette.successShadow}`,
-        textTransform: "uppercase" as const,
-      },
-      primaryButtonDisabled: {
-        background: palette.disabledBg,
-        color: palette.disabledText,
-        cursor: "not-allowed",
-        boxShadow: "none",
       },
       statusTitle: {
         margin: "0 0 16px",
@@ -365,9 +346,7 @@ export default function QuestionPage() {
         <div style={styles.inner}>
           <section style={styles.bottomBar}>
             <div style={styles.bottomBarInner}>
-              <button type="button" onClick={handleContinue} style={styles.primaryButton}>
-                Continue
-              </button>
+              <ActionButton onClick={handleContinue}>Continue</ActionButton>
             </div>
           </section>
         </div>
@@ -381,8 +360,7 @@ export default function QuestionPage() {
         <section style={styles.centeredState}>
           <h1 style={styles.feedbackTitle}>Session complete!</h1>
           <p style={styles.feedbackText}>You answered {SESSION_LENGTH} questions.</p>
-          <button
-            type="button"
+          <ActionButton
             onClick={async () => {
               setAnsweredCount(0)
               setStreak(0)
@@ -392,10 +370,9 @@ export default function QuestionPage() {
               setScreenState("loading")
               await loadQuestion()
             }}
-            style={styles.primaryButton}
           >
             Restart
-          </button>
+          </ActionButton>
         </section>
       </main>
     )
@@ -505,9 +482,7 @@ export default function QuestionPage() {
             </p>
             <div style={styles.separator} />
             <div style={styles.bottomBarInner}>
-              <Button onClick={handleContinue} style={styles.primaryButton}>
-                Continue
-              </Button>
+              <ActionButton onClick={handleContinue}>Continue</ActionButton>
             </div>
           </div>
         )}
@@ -516,16 +491,9 @@ export default function QuestionPage() {
           <div style={styles.inner}>
             <div style={styles.separator} />
             <div style={styles.bottomBarInner}>
-              <Button
-                onClick={handleCheck}
-                disabled={!selectedAlternativeId}
-                style={{
-                  ...styles.primaryButton,
-                  ...(selectedAlternativeId ? {} : styles.primaryButtonDisabled),
-                }}
-              >
+              <ActionButton onClick={handleCheck} disabled={!selectedAlternativeId}>
                 Check
-              </Button>
+              </ActionButton>
             </div>
           </div>
         )}
