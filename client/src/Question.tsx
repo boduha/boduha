@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import Button from "@mui/material/Button"
+import { useTheme } from "@mui/material/styles"
 import { getNextQuestion, submitAnswer } from "./questionApi"
 
 import { logger } from "./logger"
@@ -15,6 +16,212 @@ type ScreenState =
   | "sessionComplete"
 
 export default function Question() {
+  const theme = useTheme()
+  const isDark = theme.palette.mode === "dark"
+
+  const palette = useMemo(
+    () => ({
+      pageBackground: isDark ? "#001c2d" : "#ffffff",
+      primaryText: isDark ? "#f7f7f7" : "#3c3c3c",
+      secondaryText: isDark ? "#a7b4c0" : "#6b7280",
+      accentBlue: isDark ? "#6ccfff" : "#1cb0f6",
+      line: isDark ? "#29485a" : "#e5e7eb",
+      choiceBg: isDark ? "#082131" : "#ffffff",
+      choiceBorder: isDark ? "#3a5568" : "#d7d7d7",
+      choiceText: isDark ? "#f7f7f7" : "#4b4b4b",
+      choiceSelectedBg: isDark ? "#1f7ae0" : "#ddf4ff",
+      choiceSelectedBorder: isDark ? "#1f7ae0" : "#84d8ff",
+      choiceSelectedText: isDark ? "#ffffff" : "#1d4f73",
+      successBg: "#58cc02",
+      successShadow: "#46a302",
+      successText: isDark ? "#163300" : "#ffffff",
+      disabledBg: isDark ? "#31414d" : "#e5e7eb",
+      disabledText: isDark ? "#7f8c97" : "#9ca3af",
+      warningPanelBg: isDark ? "#3a2a12" : "#fef3c7",
+      warningPanelBorder: isDark ? "#8b6b2e" : "#fcd34d",
+      warningTitle: isDark ? "#ffd76a" : "#8a5a00",
+      successTitle: isDark ? "#89e219" : "#46a302",
+      tableBorder: isDark ? "#3a5568" : "#e5e7eb",
+    }),
+    [isDark],
+  )
+
+  const styles = useMemo(
+    () => ({
+      main: {
+        minHeight: "100vh",
+        width: "100%",
+        padding: "24px 0 20px",
+        display: "flex",
+        flexDirection: "column" as const,
+        boxSizing: "border-box" as const,
+        color: palette.primaryText,
+        backgroundColor: palette.pageBackground,
+        position: "relative" as const,
+      },
+      inner: {
+        width: "100%",
+        maxWidth: "980px",
+        margin: "0 auto",
+        padding: "0 32px",
+        boxSizing: "border-box" as const,
+      },
+      content: {
+        flex: 1,
+        display: "flex",
+        flexDirection: "column" as const,
+        alignItems: "center",
+        paddingTop: "88px",
+      },
+      centeredState: {
+        flex: 1,
+        display: "flex",
+        flexDirection: "column" as const,
+        alignItems: "center",
+        justifyContent: "center",
+      },
+      headerBlock: {
+        width: "100%",
+        maxWidth: "620px",
+        margin: "0 auto 20px",
+      },
+      promptTitle: {
+        margin: 0,
+        fontSize: "30px",
+        lineHeight: 1.15,
+        fontWeight: 700,
+        color: palette.primaryText,
+        textAlign: "left" as const,
+      },
+      expression: {
+        margin: "0 0 44px",
+        fontSize: "56px",
+        lineHeight: 1.05,
+        fontWeight: 700,
+        color: palette.primaryText,
+        textAlign: "center" as const,
+      },
+      choicesGrid: {
+        display: "grid",
+        gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+        gap: "16px",
+        width: "100%",
+        maxWidth: "620px",
+        margin: "0 auto",
+      },
+      bottomBar: {
+        width: "100%",
+        marginTop: "auto",
+        paddingTop: "28px",
+        paddingBottom: "32px",
+        display: "flex",
+        flexDirection: "column" as const,
+        alignItems: "stretch",
+      },
+      separator: {
+        width: "100%",
+        height: "2px",
+        backgroundColor: palette.line,
+        marginBottom: "20px",
+      },
+      bottomBarInner: {
+        width: "100%",
+        display: "flex",
+        justifyContent: "flex-end",
+      },
+      primaryButton: {
+        minWidth: "180px",
+        minHeight: "56px",
+        padding: "14px 28px",
+        border: "none",
+        borderRadius: "16px",
+        background: palette.successBg,
+        color: palette.successText,
+        fontSize: "22px",
+        fontWeight: 800,
+        cursor: "pointer",
+        boxShadow: `0 4px 0 ${palette.successShadow}`,
+        textTransform: "uppercase" as const,
+      },
+      primaryButtonDisabled: {
+        background: palette.disabledBg,
+        color: palette.disabledText,
+        cursor: "not-allowed",
+        boxShadow: "none",
+      },
+      statusTitle: {
+        margin: "0 0 16px",
+        fontSize: "28px",
+        lineHeight: 1.2,
+        fontWeight: 700,
+        color: palette.primaryText,
+        textAlign: "center" as const,
+      },
+      feedbackPanelNotQuite: {
+        maxWidth: "560px",
+        margin: "0 auto 24px",
+        padding: "24px",
+        borderRadius: "16px",
+        background: palette.warningPanelBg,
+        border: `1px solid ${palette.warningPanelBorder}`,
+      },
+      feedbackTitle: {
+        margin: "0 0 12px",
+        fontSize: "30px",
+        lineHeight: 1.2,
+        fontWeight: 800,
+        color: palette.successTitle,
+        textAlign: "center" as const,
+      },
+      feedbackTitleWarning: {
+        margin: "0 0 12px",
+        fontSize: "30px",
+        lineHeight: 1.2,
+        fontWeight: 800,
+        color: palette.warningTitle,
+        textAlign: "center" as const,
+      },
+      feedbackText: {
+        margin: 0,
+        fontSize: "22px",
+        lineHeight: 1.4,
+        color: palette.primaryText,
+        textAlign: "center" as const,
+      },
+      action: {
+        color: palette.accentBlue,
+        fontWeight: 800,
+      },
+      table: {
+        margin: "0 auto 32px",
+        borderCollapse: "collapse" as const,
+      },
+      cell: {
+        padding: "12px 24px",
+        border: `1px solid ${palette.tableBorder}`,
+        fontSize: "24px",
+        fontWeight: 600,
+        textAlign: "center" as const,
+        color: palette.primaryText,
+      },
+      progressRow: {
+        width: "100%",
+        maxWidth: "620px",
+        margin: "0 auto 24px",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+      },
+      progressText: {
+        margin: 0,
+        fontSize: "18px",
+        fontWeight: 700,
+        color: palette.secondaryText,
+      },
+    }),
+    [palette],
+  )
+
   const [question, setQuestion] = useState<Question | null>(null)
   const [answerResult, setAnswerResult] = useState<AnswerResult | null>(null)
   const [streak, setStreak] = useState(0)
@@ -110,7 +317,6 @@ export default function Question() {
     await loadQuestion()
   }
 
-
   if (screenState === "error") {
     return (
       <main style={styles.main}>
@@ -131,36 +337,38 @@ export default function Question() {
       <main style={styles.main}>
         <section style={styles.centeredState}>
           <div style={styles.feedbackPanelNotQuite}>
-            <h1 style={styles.feedbackTitle}>Not quite!</h1>
+            <h1 style={styles.feedbackTitleWarning}>Not quite!</h1>
             <p style={styles.feedbackText}>
-              {question.value}<sub style={{ fontSize: "8px" }}>10</sub> in binary is <strong>{answerResult?.correctAlternative.label}<sub style={{ fontSize: "8px" }}>2</sub></strong>.
+              {question.value}
+              <sub style={{ fontSize: "8px" }}>10</sub> in binary is{" "}
+              <strong>
+                {answerResult?.correctAlternative.label}
+                <sub style={{ fontSize: "8px" }}>2</sub>
+              </strong>
+              .
             </p>
           </div>
         </section>
 
         <div style={styles.inner}>
-          <div style={styles.bottomBarInner}></div>
           <section style={styles.bottomBar}>
             <div style={styles.bottomBarInner}>
               <button type="button" onClick={handleContinue} style={styles.primaryButton}>
                 Continue
               </button>
             </div>
-
           </section>
         </div>
-
       </main>
     )
   }
+
   if (screenState === "sessionComplete") {
     return (
       <main style={styles.main}>
         <section style={styles.centeredState}>
           <h1 style={styles.feedbackTitle}>Session complete!</h1>
-          <p style={styles.feedbackText}>
-            You answered {SESSION_LENGTH} questions.
-          </p>
+          <p style={styles.feedbackText}>You answered {SESSION_LENGTH} questions.</p>
           <button
             type="button"
             onClick={async () => {
@@ -180,12 +388,12 @@ export default function Question() {
       </main>
     )
   }
+
   const [ac, ...restParts] = question.statement.split(" ")
   const rest = restParts.join(" ")
 
   return (
     <main style={styles.main}>
-
       <section style={styles.content}>
         <div style={styles.inner}>
           <div style={styles.progressRow}>
@@ -199,9 +407,7 @@ export default function Question() {
             </h1>
           </div>
 
-          {question.type === "PLAIN" && (
-            <p style={styles.expression}>{question.value} = ?</p>
-          )}
+          {question.type === "PLAIN" && <p style={styles.expression}>{question.value} = ?</p>}
 
           {question.type === "TABLE" && question.rows && (
             <table style={styles.table}>
@@ -215,32 +421,39 @@ export default function Question() {
               </tbody>
             </table>
           )}
+
           <div style={styles.choicesGrid}>
             {question.alternatives.map((alternative) => {
               const isSelected = selectedAlternativeId === alternative.id
+
               return (
                 <Button
                   disableRipple
                   disableFocusRipple
                   key={alternative.id}
-                  variant={isSelected ? "contained" : "outlined"}
-                  color={isSelected ? "primary" : "inherit"}
-
                   fullWidth
-                  //onClick={() => setSelectedAlternativeId(alternative.id)}
                   onClick={() => {
                     const clickSound = new Audio("/sounds/tap.mp3")
-
                     clickSound.currentTime = 0
-                    clickSound.play()
+                    void clickSound.play()
                     setSelectedAlternativeId(alternative.id)
                   }}
                   sx={{
                     height: "64px",
                     fontSize: "1.5rem",
-                    borderRadius: "12px",
+                    fontWeight: 500,
+                    borderRadius: "16px",
                     textTransform: "none",
-                    boxShadow: isSelected ? 3 : 1,
+                    boxShadow: "none",
+                    backgroundColor: isSelected ? palette.choiceSelectedBg : palette.choiceBg,
+                    color: isSelected ? palette.choiceSelectedText : palette.choiceText,
+                    border: `2px solid ${
+                      isSelected ? palette.choiceSelectedBorder : palette.choiceBorder
+                    }`,
+                    "&:hover": {
+                      backgroundColor: isSelected ? palette.choiceSelectedBg : palette.choiceBg,
+                      boxShadow: "none",
+                    },
                   }}
                 >
                   {alternative.label}
@@ -249,34 +462,27 @@ export default function Question() {
             })}
           </div>
         </div>
-
       </section>
 
       <section style={styles.bottomBar}>
-
-
         {screenState === "correct" && (
           <div style={styles.inner}>
             <h1 style={styles.feedbackTitle}>Correct!</h1>
             <p style={styles.feedbackText}>
               {question.value}
-              <sub style={{ fontSize: "8px" }}>10</sub>
-              {" "}in binary is{" "}
+              <sub style={{ fontSize: "8px" }}>10</sub> in binary is{" "}
               <strong>
-                {answerResult.correctAlternative.label}
+                {answerResult?.correctAlternative.label}
                 <sub style={{ fontSize: "8px" }}>2</sub>
-              </strong>.
+              </strong>
+              .
             </p>
             <div style={styles.separator} />
             <div style={styles.bottomBarInner}>
-
-              <Button onClick={handleContinue}
-                style={styles.primaryButton}
-              >
+              <Button onClick={handleContinue} style={styles.primaryButton}>
                 Continue
               </Button>
             </div>
-
           </div>
         )}
 
@@ -284,7 +490,6 @@ export default function Question() {
           <div style={styles.inner}>
             <div style={styles.separator} />
             <div style={styles.bottomBarInner}>
-
               <Button
                 onClick={handleCheck}
                 disabled={!selectedAlternativeId}
@@ -298,185 +503,7 @@ export default function Question() {
             </div>
           </div>
         )}
-
-
       </section>
-
     </main>
   )
-}
-
-const styles = {
-  main: {
-    minHeight: "100vh",
-    width: "100%",              // 👈 full width
-    padding: "24px 0 20px",    // 👈 remove horizontal padding here
-    display: "flex",
-    flexDirection: "column" as const,
-    boxSizing: "border-box" as const,
-    color: "inherit",
-    position: "relative",
-  },
-  inner: {
-    width: "100%",
-    maxWidth: "980px",
-    margin: "0 auto",
-    padding: "0 32px",
-    boxSizing: "border-box" as const,
-  },
-  content: {
-    flex: 1,
-    display: "flex",
-    flexDirection: "column" as const,
-    alignItems: "center",
-    paddingTop: "88px",
-  },
-  centeredState: {
-    flex: 1,
-    display: "flex",
-    flexDirection: "column" as const,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  headerBlock: {
-    width: "100%",
-    maxWidth: "620px",
-    margin: "0 auto 20px",
-  },
-  promptTitle: {
-    margin: 0,
-    fontSize: "30px",
-    lineHeight: 1.15,
-    fontWeight: 600,
-    color: "#24364d",
-    textAlign: "left" as const,
-  },
-  expression: {
-    margin: "0 0 44px",
-    fontSize: "56px",
-    lineHeight: 1.05,
-    fontWeight: 700,
-    color: "#24364d",
-    textAlign: "center" as const,
-  },
-  choicesGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-    gap: "16px",
-    width: "100%",
-    maxWidth: "620px",
-    margin: "0 auto",
-  },
-  bottomBar: {
-    width: "100%",
-    marginTop: "auto",
-    paddingTop: "28px",
-    paddingBottom: "32px",
-    display: "flex",
-    flexDirection: "column" as const,
-    alignItems: "stretch",
-    //backgroundColor: "#ffffff", // 👈 subtle surface
-  },
-  separator: {
-    width: "100%",
-    height: "1px",
-    backgroundColor: "#e5e7eb",
-    marginBottom: "20px",
-    boxShadow: "0 -1px 0 rgba(0,0,0,0.02)",
-  },
-  bottomBarInner: {
-    width: "100%",
-    display: "flex",
-    justifyContent: "flex-end",
-  },
-  primaryButton: {
-    minWidth: "180px",
-    minHeight: "56px",
-    padding: "14px 28px",
-    border: "none",
-    borderRadius: "14px",
-    background: "#58cc02",
-    color: "white",
-    fontSize: "22px",
-    fontWeight: 700,
-    cursor: "pointer",
-    boxShadow: "0 4px 0 #46a302",
-  },
-  primaryButtonDisabled: {
-    background: "#e5e7eb",
-    color: "#9ca3af",
-    cursor: "not-allowed",
-    boxShadow: "none",
-  },
-  statusTitle: {
-    margin: "0 0 16px",
-    fontSize: "28px",
-    lineHeight: 1.2,
-    fontWeight: 700,
-    color: "#24364d",
-    textAlign: "center" as const,
-  },
-
-  feedbackPanelNotQuite: {
-    maxWidth: "560px",
-    margin: "0 auto 24px",
-    padding: "24px",
-    borderRadius: "16px",
-    background: "#fef3c7",
-    border: "1px solid #fcd34d",
-  },
-  feedbackTitle: {
-    margin: "0 0 12px",
-    fontSize: "30px",
-    lineHeight: 1.2,
-    fontWeight: 700,
-    color: "#24364d",
-    textAlign: "center" as const,
-  },
-  feedbackText: {
-    margin: 0,
-    fontSize: "22px",
-    lineHeight: 1.4,
-    color: "#374151",
-    textAlign: "center" as const,
-  },
-  action: {
-    color: "#1cb0f6",
-    fontWeight: 700,
-  },
-
-  table: {
-    margin: "0 auto 32px",
-    borderCollapse: "collapse" as const,
-  },
-  cell: {
-    padding: "12px 24px",
-    border: "1px solid #e5e7eb",
-    fontSize: "24px",
-    fontWeight: 600,
-    textAlign: "center" as const,
-  },
-  overlay: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    width: "100%",
-    display: "flex",
-    justifyContent: "center",
-    pointerEvents: "none", // allows background to stay visible
-  },
-  progressRow: {
-    width: "100%",
-    maxWidth: "620px",
-    margin: "0 auto 24px",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  progressText: {
-    margin: 0,
-    fontSize: "18px",
-    fontWeight: 700,
-    color: "#24364d",
-  },
 }
