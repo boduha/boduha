@@ -81,7 +81,7 @@ private TablePattern nextTablePattern() {
 
 
 private String generateWrongBinary(int number) {
-    return Integer.toBinaryString(Math.max(0, number - 1));
+    return toBinary(Math.max(0, number - 1));
 }
 
     private List<Alternative> generateAlternatives(int number, UserState state) {
