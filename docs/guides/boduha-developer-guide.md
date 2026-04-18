@@ -51,18 +51,13 @@ Expected result:
 Open the forwarded port (see section 5) and access:
 
 ```text
-/question/42
+/question
 ```
 
 Example response:
 
 ```json
-{
-  "id": 42,
-  "statement": "Convert 42 to binary",
-  "value": 42,
-  "expectedAnswer": "101010"
-}
+{"id":7,"value":7,"type":"PLAIN","statement":"Convert from decimal to binary","alternatives":[{"id":"a","label":"0110"},{"id":"b","label":"0111"},{"id":"c","label":"1110"},{"id":"d","label":"0011"}],"rows":null}
 ```
 
 ---
@@ -175,7 +170,7 @@ VITE_API_BASE_URL=https://your-server.com
 Recommended order:
 
 1. Start the **server**
-2. Test `/question/42`
+2. Test `/question`
 3. Start the **client**
 4. Connect client → server
 
@@ -246,7 +241,7 @@ Use:
 
 This is an early stage of the project:
 
-* One backend endpoint (`/question/42`)
+* One backend endpoint (`/question/`)
 * Simple client consumption
 * No persistence
 * No authentication
