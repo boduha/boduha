@@ -37,20 +37,52 @@ public class QuestionService {
                 null);
     }
 
-    private Question generateTableQuestion(UserState state) {
-        state.setCorrectAlternative(new Alternative("a", "1000"));
+private Question generateTableQuestion(UserState state) {
+    TablePattern pattern = nextTablePattern();
 
-        return new Question(
-                1000 + questionCount,
-                8,
-                QuestionType.TABLE,
-                "Follow the pattern",
-                List.of(new Alternative("a", "1000"),
-                        new Alternative("b", "0111")),
-                List.of(new Question.TableRow("2", "10"),
-                        new Question.TableRow("4", "100"),
-                        new Question.TableRow("8", "?")));
-    }
+    String correctBinary = toBinary(pattern.missingDecimal);
+    state.setCorrectAlternative(new Alternative("a", correctBinary));
+
+    return new Question(
+            1000 + questionCount,
+            8,
+            QuestionType.TABLE,
+            "Follow the pattern",
+            List.of(
+                    new Alternative("a", correctBinary),
+                    new Alternative("b", generateWrongBinary(pattern.missingDecimal))
+            ),
+            List.of(
+                    new Question.TableRow(String.valueOf(pattern.first), toBinary(pattern.first)),
+                    new Question.TableRow(String.valueOf(pattern.second), toBinary(pattern.second)),
+                    new Question.TableRow(String.valueOf(pattern.missingDecimal), "?")
+            )
+    );
+}
+
+private record TablePattern(int first, int second, int missingDecimal) {
+}
+
+private TablePattern nextTablePattern() {
+    List<TablePattern> patterns = List.of(
+            new TablePattern(1, 2, 3),
+            new TablePattern(15, 14, 13),
+            new TablePattern(1, 3, 5),
+            new TablePattern(12, 13, 14),
+            new TablePattern(5, 6, 7),
+            new TablePattern(7, 8, 9),
+            new TablePattern(10, 12, 14),
+            new TablePattern(11, 13, 15)
+    );
+
+    int index = questionCount % patterns.size();
+    return patterns.get(index);
+}
+
+
+private String generateWrongBinary(int number) {
+    return Integer.toBinaryString(Math.max(0, number - 1));
+}
 
     private List<Alternative> generateAlternatives(int number, UserState state) {
         String correct = toBinary(number);
