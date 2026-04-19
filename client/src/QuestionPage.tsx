@@ -16,6 +16,17 @@ type ScreenState =
   | "error"
   | "sessionComplete"
 
+function hideStartupSplash() {
+  const splash = document.getElementById("startup-splash")
+  if (!splash) return
+
+  splash.classList.add("fade-out")
+
+  window.setTimeout(() => {
+    splash.remove()
+  }, 320)
+}
+
 export default function QuestionPage() {
   const theme = useTheme()
   const isDark = theme.palette.mode === "dark"
@@ -86,7 +97,6 @@ export default function QuestionPage() {
         maxWidth: "620px",
         margin: "0 auto 12px",
       },
-
       expression: {
         margin: "0 0 28px",
         fontSize: "56px",
@@ -128,7 +138,6 @@ export default function QuestionPage() {
         backgroundColor: palette.line,
         marginBottom: "20px",
         marginTop: "32px",
-
       },
       bottomBarInner: {
         width: "100%",
@@ -168,7 +177,6 @@ export default function QuestionPage() {
         color: palette.warningTitle,
         textAlign: "center" as const,
         fontFamily: "Buenard, serif",
-
       },
       feedbackText: {
         margin: 0,
@@ -177,7 +185,6 @@ export default function QuestionPage() {
         color: palette.primaryText,
         textAlign: "center" as const,
         fontFamily: "Buenard, serif",
-
       },
       action: {
         color: palette.accentBlue,
@@ -192,7 +199,6 @@ export default function QuestionPage() {
       cell: {
         padding: "12px 24px",
         border: "none",
-
         fontSize: "24px",
         fontWeight: 600,
         textAlign: "center" as const,
@@ -212,6 +218,45 @@ export default function QuestionPage() {
         fontWeight: 700,
         color: palette.secondaryText,
       },
+
+      sessionCompleteWrap: {
+        width: "100%",
+        maxWidth: "560px",
+        margin: "0 auto",
+        padding: "24px 16px",
+        display: "flex",
+        flexDirection: "column" as const,
+        alignItems: "center",
+      },
+      sessionScoreFraction: {
+        margin: "8px 0 0",
+        fontSize: "36px",
+        lineHeight: 1.1,
+        fontWeight: 800,
+        color: palette.primaryText,
+        textAlign: "center" as const,
+        fontFamily: "Buenard, serif",
+      },
+      sessionScorePercent: {
+        margin: "8px 0 12px",
+        fontSize: "72px",
+        lineHeight: 1,
+        fontWeight: 800,
+        color: palette.accentBlue,
+        textAlign: "center" as const,
+        fontFamily: "Buenard, serif",
+      },
+      sessionSupportText: {
+        margin: 0,
+        fontSize: "20px",
+        lineHeight: 1.4,
+        color: palette.secondaryText,
+        textAlign: "center" as const,
+        fontFamily: "Buenard, serif",
+      },
+      sessionRestartWrap: {
+        marginTop: "28px",
+      },
     }),
     [palette],
   )
@@ -219,11 +264,15 @@ export default function QuestionPage() {
   const [question, setQuestion] = useState<Question | null>(null)
   const [answerResult, setAnswerResult] = useState<AnswerResult | null>(null)
   const [streak, setStreak] = useState(0)
+  const [correctCount, setCorrectCount] = useState(0)
   const [answeredCount, setAnsweredCount] = useState(0)
   const [selectedAlternativeId, setSelectedAlternativeId] = useState<string | null>(null)
   const [screenState, setScreenState] = useState<ScreenState>("loading")
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const SESSION_LENGTH = 8
+
+  const successPercentage =
+    answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0
 
   async function loadQuestion() {
     try {
@@ -265,10 +314,15 @@ export default function QuestionPage() {
         setScreenState("question")
       } catch (error) {
         if (cancelled) return
-
         logger.error("Error loading question", error)
         setErrorMessage("Could not load question.")
         setScreenState("error")
+      } finally {
+        if (cancelled) return
+        requestAnimationFrame(() => {
+          if (cancelled) return
+          hideStartupSplash()
+        })
       }
     }
 
@@ -287,11 +341,14 @@ export default function QuestionPage() {
 
       const result = await submitAnswer(question.id, submission)
       setAnswerResult(result)
+
       if (result.correct) {
         setStreak((current) => current + 1)
+        setCorrectCount((current) => current + 1)
       } else {
         setStreak(0)
       }
+
       setAnsweredCount((current) => current + 1)
       setScreenState(result.correct ? "correct" : "notQuite")
     } catch (error) {
@@ -359,21 +416,38 @@ export default function QuestionPage() {
     return (
       <main style={styles.main}>
         <section style={styles.centeredState}>
-          <h1 style={styles.feedbackTitle}>Session complete!</h1>
-          <p style={styles.feedbackText}>You answered {SESSION_LENGTH} questions.</p>
-          <ActionButton
-            onClick={async () => {
-              setAnsweredCount(0)
-              setStreak(0)
-              setSelectedAlternativeId(null)
-              setAnswerResult(null)
-              setErrorMessage(null)
-              setScreenState("loading")
-              await loadQuestion()
-            }}
-          >
-            Restart
-          </ActionButton>
+          <div style={styles.sessionCompleteWrap}>
+            <h1 style={styles.feedbackTitle}>Session complete!</h1>
+
+            <p style={styles.sessionScoreFraction}>
+              {correctCount}/{SESSION_LENGTH} correct answers
+            </p>
+
+            <p style={styles.sessionScorePercent}>{successPercentage}%</p>
+
+            <p style={styles.sessionSupportText}>
+              {correctCount === SESSION_LENGTH
+                ? "Perfect session."
+                : "Good work. Keep practicing."}
+            </p>
+
+            <div style={styles.sessionRestartWrap}>
+              <ActionButton
+                onClick={async () => {
+                  setAnsweredCount(0)
+                  setCorrectCount(0)
+                  setStreak(0)
+                  setSelectedAlternativeId(null)
+                  setAnswerResult(null)
+                  setErrorMessage(null)
+                  setScreenState("loading")
+                  await loadQuestion()
+                }}
+              >
+                Restart
+              </ActionButton>
+            </div>
+          </div>
         </section>
       </main>
     )
@@ -403,7 +477,8 @@ export default function QuestionPage() {
             <table style={styles.table}>
               <tbody>
                 {question.rows.map((row, index) => (
-                  <tr key={index}
+                  <tr
+                    key={index}
                     style={{
                       borderTop: `1px solid ${palette.tableBorder}`,
                       borderBottom: `1px solid ${palette.tableBorder}`,
@@ -452,8 +527,9 @@ export default function QuestionPage() {
                     boxShadow: "none",
                     backgroundColor: isSelected ? palette.choiceSelectedBg : palette.choiceBg,
                     color: isSelected ? palette.choiceSelectedText : palette.choiceText,
-                    border: `2px solid ${isSelected ? palette.choiceSelectedBorder : palette.choiceBorder
-                      }`,
+                    border: `2px solid ${
+                      isSelected ? palette.choiceSelectedBorder : palette.choiceBorder
+                    }`,
                     "&:hover": {
                       backgroundColor: isSelected ? palette.choiceSelectedBg : palette.choiceBg,
                       boxShadow: "none",
