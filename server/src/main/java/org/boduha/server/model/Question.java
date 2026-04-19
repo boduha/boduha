@@ -1,7 +1,10 @@
-package org.boduha.server;
+package org.boduha.server.model;
 
 import java.util.List;
 
+/**
+ * A question.
+ */
 public record Question(
         Integer id,
         Integer value,
@@ -10,6 +13,9 @@ public record Question(
         List<Alternative> alternatives,
         List<TableRow> rows // nullable, only for TABLE
 ) {
+    /**
+     * 
+     */
     public record TableRow(String left, String right) {
     }
 }
