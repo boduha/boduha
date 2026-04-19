@@ -19,7 +19,10 @@ public class QuestionService {
         questionCount++;
 
         if (questionCount % 4 == 0) {
-            return generateTableQuestion(state);
+            if (random.nextBoolean()) {
+                return generateTableQuestion(state);
+            }
+            return generateParityQuestion(state);
         }
 
         return generatePlainQuestion(state);
@@ -37,52 +40,120 @@ public class QuestionService {
                 null);
     }
 
-private Question generateTableQuestion(UserState state) {
-    TablePattern pattern = nextTablePattern();
+private Question generateParityQuestion(UserState state) {
+    int number = state.nextNumber();
+    String binary = toBinary(number);
 
-    String correctBinary = toBinary(pattern.missingDecimal);
-    state.setCorrectAlternative(new Alternative("a", correctBinary));
+    String correctText = binary.endsWith("0") ? "Even" : "Odd";
+    String wrongText = correctText.equals("Even") ? "Odd" : "Even";
+
+    List<String> values = new ArrayList<>(List.of(correctText, wrongText));
+    Collections.shuffle(values, random);
+
+    List<Alternative> alternatives = new ArrayList<>();
+    for (int i = 0; i < values.size(); i++) {
+        String id = i == 0 ? "a" : "b";
+        alternatives.add(new Alternative(id, values.get(i)));
+    }
+
+    Alternative correctAlternative = alternatives.stream()
+            .filter(a -> a.label().equals(correctText))
+            .findFirst()
+            .orElseThrow();
+
+    state.setCorrectAlternative(correctAlternative);
 
     return new Question(
-            1000 + questionCount,
-            8,
-            QuestionType.TABLE,
-            "Follow the pattern",
-            List.of(
-                    new Alternative("a", correctBinary),
-                    new Alternative("b", generateWrongBinary(pattern.missingDecimal))
-            ),
-            List.of(
-                    new Question.TableRow(String.valueOf(pattern.first), toBinary(pattern.first)),
-                    new Question.TableRow(String.valueOf(pattern.second), toBinary(pattern.second)),
-                    new Question.TableRow(String.valueOf(pattern.missingDecimal), "?")
-            )
+            2000 + questionCount,
+            number,
+            QuestionType.PARITY,
+            "Is it even or odd?",
+            alternatives,
+            List.of(new Question.TableRow("", binary))
     );
 }
 
-private record TablePattern(int first, int second, int missingDecimal) {
-}
+    private Question generateTableQuestion(UserState state) {
+        TablePattern pattern = nextTablePattern();
 
-private TablePattern nextTablePattern() {
-    List<TablePattern> patterns = List.of(
-            new TablePattern(1, 2, 3),
-            new TablePattern(15, 14, 13),
-            new TablePattern(1, 3, 5),
-            new TablePattern(12, 13, 14),
-            new TablePattern(5, 6, 7),
-            new TablePattern(7, 8, 9),
-            new TablePattern(10, 12, 14),
-            new TablePattern(11, 13, 15)
-    );
+        String correctBinary = toBinary(pattern.missingDecimal);
+        String wrongBinary = generateWrongBinary(pattern);
 
-    int index = questionCount % patterns.size();
-    return patterns.get(index);
-}
+        List<String> values = new ArrayList<>();
+        values.add(correctBinary);
+        values.add(wrongBinary);
 
+        Collections.shuffle(values, random);
 
-private String generateWrongBinary(int number) {
-    return toBinary(Math.max(0, number - 1));
-}
+        List<Alternative> alternatives = new ArrayList<>();
+        for (int i = 0; i < values.size(); i++) {
+            String id = i == 0 ? "a" : "b";
+            Alternative alt = new Alternative(id, values.get(i));
+            alternatives.add(alt);
+
+            if (values.get(i).equals(correctBinary)) {
+                state.setCorrectAlternative(alt);
+            }
+        }
+
+        return new Question(
+                1000 + questionCount,
+                pattern.missingDecimal,
+                QuestionType.TABLE,
+                "Follow the pattern",
+                alternatives,
+                List.of(
+                        new Question.TableRow(String.valueOf(pattern.first), toBinary(pattern.first)),
+                        new Question.TableRow(String.valueOf(pattern.second), toBinary(pattern.second)),
+                        new Question.TableRow(String.valueOf(pattern.missingDecimal), "?")));
+    }
+
+    private record TablePattern(int first, int second, int missingDecimal) {
+    }
+
+    private TablePattern nextTablePattern() {
+        List<TablePattern> patterns = List.of(
+                new TablePattern(1, 2, 3),
+                new TablePattern(15, 14, 13),
+                new TablePattern(1, 3, 5),
+                new TablePattern(12, 13, 14),
+                new TablePattern(5, 6, 7),
+                new TablePattern(7, 8, 9),
+                new TablePattern(10, 12, 14),
+                new TablePattern(11, 13, 15));
+
+        int index = questionCount % patterns.size();
+        return patterns.get(index);
+    }
+
+    private String generateWrongBinary(TablePattern pattern) {
+        String correct = toBinary(pattern.missingDecimal);
+
+        List<String> candidates = new ArrayList<>();
+
+        candidates.add(toBinary(Math.max(0, pattern.missingDecimal - 1))); // off by one down
+        candidates.add(toBinary(pattern.missingDecimal + 1)); // off by one up
+        candidates.add(toBinary(pattern.second)); // copies previous answer
+        candidates.add(oneBitWrong(correct)); // one bit mistake
+        candidates.add(shiftLeft(correct)); // shift error
+        candidates.add(shiftRight(correct)); // shift error
+        candidates.add(reverse(correct)); // reversed bits
+
+        candidates.removeIf(value -> value == null || value.equals(correct));
+
+        Collections.shuffle(candidates, random);
+
+        if (!candidates.isEmpty()) {
+            return candidates.get(0);
+        }
+
+        String fallback;
+        do {
+            fallback = randomBinary(correct.length());
+        } while (fallback.equals(correct));
+
+        return fallback;
+    }
 
     private List<Alternative> generateAlternatives(int number, UserState state) {
         String correct = toBinary(number);

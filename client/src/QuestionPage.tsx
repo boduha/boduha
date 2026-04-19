@@ -338,6 +338,9 @@ export default function QuestionPage() {
 
     try {
       const submission: AnswerSubmission = { answer: selectedAlternativeId }
+      const clickSound = new Audio("/sounds/tap.mp3")
+      clickSound.currentTime = 0
+      void clickSound.play()
 
       const result = await submitAnswer(question.id, submission)
       setAnswerResult(result)
@@ -359,6 +362,9 @@ export default function QuestionPage() {
   }
 
   async function handleContinue() {
+    const clickSound = new Audio("/sounds/tap.mp3")
+    clickSound.currentTime = 0
+    void clickSound.play()
     if (answeredCount >= SESSION_LENGTH) {
       setScreenState("sessionComplete")
       return
@@ -383,34 +389,71 @@ export default function QuestionPage() {
     return null
   }
 
-  if (screenState === "notQuite") {
-    return (
-      <main style={styles.main}>
-        <section style={styles.centeredState}>
-          <div style={styles.feedbackPanelNotQuite}>
-            <h1 style={styles.feedbackTitleWarning}>Not quite!</h1>
-            <p style={styles.feedbackText}>
-              {question.value}
-              <sub style={{ fontSize: "8px" }}>10</sub> in binary is{" "}
-              <strong>
-                {answerResult?.correctAlternative.label}
-                <sub style={{ fontSize: "8px" }}>2</sub>
-              </strong>
-              .
-            </p>
-          </div>
-        </section>
+if (screenState === "notQuite") {
+  const renderNotQuiteMessage = () => {
+    if (!question || !answerResult) return null
 
-        <div style={styles.inner}>
-          <section style={styles.bottomBar}>
-            <div style={styles.bottomBarInner}>
-              <ActionButton onClick={handleContinue}>Continue</ActionButton>
-            </div>
-          </section>
-        </div>
-      </main>
+
+if (question.type === "PARITY") {
+const binary = question.rows?.[0]?.right 
+  const isEven = answerResult.correctAlternative.label === "Even"
+  const lastBit = isEven ? "0" : "1"
+
+  return (
+    <p style={styles.feedbackText}>
+      {binary}
+      <sub style={{ fontSize: "8px" }}>2</sub> is{" "}
+      <strong>{answerResult.correctAlternative.label}</strong>{" "}
+      because it ends in {lastBit}.
+    </p>
+  )
+}
+
+    if (question.type === "TABLE") {
+      return (
+        <p style={styles.feedbackText}>
+          The missing binary value is{" "}
+          <strong>
+            {answerResult.correctAlternative.label}
+            <sub style={{ fontSize: "8px" }}>2</sub>
+          </strong>
+          .
+        </p>
+      )
+    }
+
+    return (
+      <p style={styles.feedbackText}>
+        {question.value}
+        <sub style={{ fontSize: "8px" }}>10</sub> in binary is{" "}
+        <strong>
+          {answerResult.correctAlternative.label}
+          <sub style={{ fontSize: "8px" }}>2</sub>
+        </strong>
+        .
+      </p>
     )
   }
+
+  return (
+    <main style={styles.main}>
+      <section style={styles.centeredState}>
+        <div style={styles.feedbackPanelNotQuite}>
+          <h1 style={styles.feedbackTitleWarning}>Not quite!</h1>
+          {renderNotQuiteMessage()}
+        </div>
+      </section>
+
+      <div style={styles.inner}>
+        <section style={styles.bottomBar}>
+          <div style={styles.bottomBarInner}>
+            <ActionButton onClick={handleContinue}>Continue</ActionButton>
+          </div>
+        </section>
+      </div>
+    </main>
+  )
+}
 
   if (screenState === "sessionComplete") {
     return (
@@ -434,6 +477,9 @@ export default function QuestionPage() {
             <div style={styles.sessionRestartWrap}>
               <ActionButton
                 onClick={async () => {
+                  const clickSound = new Audio("/sounds/tap.mp3")
+                  clickSound.currentTime = 0
+                  void clickSound.play()
                   setAnsweredCount(0)
                   setCorrectCount(0)
                   setStreak(0)
@@ -472,6 +518,7 @@ export default function QuestionPage() {
           </div>
 
           {question.type === "PLAIN" && <p style={styles.expression}>{question.value} = ?</p>}
+          {question.type === "PARITY" && <p style={styles.expression}>Binary: {question.rows[0].right}</p>}
 
           {question.type === "TABLE" && question.rows && (
             <table style={styles.table}>
@@ -527,9 +574,8 @@ export default function QuestionPage() {
                     boxShadow: "none",
                     backgroundColor: isSelected ? palette.choiceSelectedBg : palette.choiceBg,
                     color: isSelected ? palette.choiceSelectedText : palette.choiceText,
-                    border: `2px solid ${
-                      isSelected ? palette.choiceSelectedBorder : palette.choiceBorder
-                    }`,
+                    border: `2px solid ${isSelected ? palette.choiceSelectedBorder : palette.choiceBorder
+                      }`,
                     "&:hover": {
                       backgroundColor: isSelected ? palette.choiceSelectedBg : palette.choiceBg,
                       boxShadow: "none",

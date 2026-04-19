@@ -1,3 +1,3 @@
 package org.boduha.server;
 
-public enum QuestionType {PLAIN, TABLE}
+public enum QuestionType {PLAIN, TABLE, PARITY}
