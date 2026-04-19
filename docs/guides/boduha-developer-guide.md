@@ -116,7 +116,7 @@ Always use the forwarded URL.
 Useful URLs:
 
 * `/` → (optional landing page)
-* `/question/42` → main endpoint
+* `/question` → main endpoint
 * `/swagger-ui.html` → API UI (if enabled)
 * `/v3/api-docs` → OpenAPI JSON (if enabled)
 

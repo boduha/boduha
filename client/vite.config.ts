@@ -6,16 +6,14 @@ export default defineConfig({
   plugins: [react()],
 
   server: {
-    //host: true,
+    host: true,
     proxy: {
       "/question": {
-        target: "http://localhost:8080",
+        //target: "http://localhost:8080",
 
-        //target: "http://192.168.15.109:8080",
+        target: "http://192.168.15.81:8080",
         changeOrigin: true,
       },
     },
   },
-
-}
-)
+})

@@ -50,9 +50,9 @@ export default function QuestionPage() {
   const styles = useMemo(
     () => ({
       main: {
-        minHeight: "100vh",
+        minHeight: "100dvh",
         width: "100%",
-        padding: "24px 0 20px",
+        padding: "8px 0 20px",
         display: "flex",
         flexDirection: "column" as const,
         boxSizing: "border-box" as const,
@@ -60,19 +60,19 @@ export default function QuestionPage() {
         backgroundColor: palette.pageBackground,
         position: "relative" as const,
       },
-      inner: {
-        width: "100%",
-        maxWidth: "980px",
-        margin: "0 auto",
-        padding: "0 32px",
-        boxSizing: "border-box" as const,
-      },
       content: {
         flex: 1,
         display: "flex",
         flexDirection: "column" as const,
         alignItems: "center",
-        paddingTop: "88px",
+        paddingTop: "20px",
+      },
+      inner: {
+        width: "100%",
+        maxWidth: "980px",
+        margin: "0 auto",
+        padding: "0 16px",
+        boxSizing: "border-box" as const,
       },
       centeredState: {
         flex: 1,
@@ -84,7 +84,17 @@ export default function QuestionPage() {
       headerBlock: {
         width: "100%",
         maxWidth: "620px",
-        margin: "0 auto 20px",
+        margin: "0 auto 12px",
+      },
+
+      expression: {
+        margin: "0 0 28px",
+        fontSize: "56px",
+        lineHeight: 1.05,
+        fontWeight: 700,
+        color: palette.primaryText,
+        textAlign: "center" as const,
+        fontFamily: "Buenard, serif",
       },
       promptTitle: {
         margin: 0,
@@ -93,15 +103,6 @@ export default function QuestionPage() {
         fontWeight: 700,
         color: palette.primaryText,
         textAlign: "left" as const,
-        fontFamily: "Buenard, serif",
-      },
-      expression: {
-        margin: "0 0 44px",
-        fontSize: "56px",
-        lineHeight: 1.05,
-        fontWeight: 700,
-        color: palette.primaryText,
-        textAlign: "center" as const,
         fontFamily: "Buenard, serif",
       },
       choicesGrid: {
