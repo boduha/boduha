@@ -27,6 +27,55 @@ function hideStartupSplash() {
   }, 320)
 }
 
+function getFeedbackMessage(question: Question, answerResult: AnswerResult) {
+  switch (question.type) {
+    case "PLAIN":
+      return (
+        <>
+          {question.value}
+          <sub style={{ fontSize: "8px" }}>10</sub> in binary is{" "}
+          <strong>
+            {answerResult.correctAlternative.label}
+            <sub style={{ fontSize: "8px" }}>2</sub>
+          </strong>
+          .
+        </>
+      )
+
+    case "PARITY": {
+      const binary = question.rows?.[0]?.right ?? ""
+      const parity = answerResult.correctAlternative.label
+      const ending = parity.toLowerCase() === "even" ? "0" : "1"
+
+      return (
+        <>
+          {binary}
+          <sub style={{ fontSize: "8px" }}>2</sub> is <strong>{parity}</strong>{" "}
+          because it ends in {ending}.
+        </>
+      )
+    }
+
+    case "TABLE":
+      const value = question.rows?.[2]?.left ?? ""
+
+      return (
+        <>
+
+          {value}
+          <sub style={{ fontSize: "8px" }}>10</sub> in binary is{" "}
+          <strong>
+            {answerResult.correctAlternative.label}
+            <sub style={{ fontSize: "8px" }}>2</sub>
+          </strong>
+          .
+        </>
+      )
+
+    default:
+      return null
+  }
+}
 export default function QuestionPage() {
   const theme = useTheme()
   const isDark = theme.palette.mode === "dark"
@@ -389,72 +438,6 @@ export default function QuestionPage() {
     return null
   }
 
-if (screenState === "notQuite") {
-  const renderNotQuiteMessage = () => {
-    if (!question || !answerResult) return null
-
-
-if (question.type === "PARITY") {
-const binary = question.rows?.[0]?.right 
-  const isEven = answerResult.correctAlternative.label === "Even"
-  const lastBit = isEven ? "0" : "1"
-
-  return (
-    <p style={styles.feedbackText}>
-      {binary}
-      <sub style={{ fontSize: "8px" }}>2</sub> is{" "}
-      <strong>{answerResult.correctAlternative.label}</strong>{" "}
-      because it ends in {lastBit}.
-    </p>
-  )
-}
-
-    if (question.type === "TABLE") {
-      return (
-        <p style={styles.feedbackText}>
-          The missing binary value is{" "}
-          <strong>
-            {answerResult.correctAlternative.label}
-            <sub style={{ fontSize: "8px" }}>2</sub>
-          </strong>
-          .
-        </p>
-      )
-    }
-
-    return (
-      <p style={styles.feedbackText}>
-        {question.value}
-        <sub style={{ fontSize: "8px" }}>10</sub> in binary is{" "}
-        <strong>
-          {answerResult.correctAlternative.label}
-          <sub style={{ fontSize: "8px" }}>2</sub>
-        </strong>
-        .
-      </p>
-    )
-  }
-
-  return (
-    <main style={styles.main}>
-      <section style={styles.centeredState}>
-        <div style={styles.feedbackPanelNotQuite}>
-          <h1 style={styles.feedbackTitleWarning}>Not quite!</h1>
-          {renderNotQuiteMessage()}
-        </div>
-      </section>
-
-      <div style={styles.inner}>
-        <section style={styles.bottomBar}>
-          <div style={styles.bottomBarInner}>
-            <ActionButton onClick={handleContinue}>Continue</ActionButton>
-          </div>
-        </section>
-      </div>
-    </main>
-  )
-}
-
   if (screenState === "sessionComplete") {
     return (
       <main style={styles.main}>
@@ -469,9 +452,15 @@ const binary = question.rows?.[0]?.right
             <p style={styles.sessionScorePercent}>{successPercentage}%</p>
 
             <p style={styles.sessionSupportText}>
-              {correctCount === SESSION_LENGTH
-                ? "Perfect session."
-                : "Good work. Keep practicing."}
+              {successPercentage === 100
+                ? "Perfect. No errors."
+                : successPercentage >= 90
+                  ? "Almost perfect."
+                  : successPercentage >= 70
+                    ? "Good. A few mistakes."
+                    : successPercentage >= 50
+                      ? "Some gaps. Practice helps."
+                      : "Needs practice."}
             </p>
 
             <div style={styles.sessionRestartWrap}>
@@ -591,17 +580,25 @@ const binary = question.rows?.[0]?.right
       </section>
 
       <section style={styles.bottomBar}>
+
         {screenState === "correct" && (
           <div style={styles.inner}>
             <h1 style={styles.feedbackTitle}>Correct!</h1>
             <p style={styles.feedbackText}>
-              {question.value}
-              <sub style={{ fontSize: "8px" }}>10</sub> in binary is{" "}
-              <strong>
-                {answerResult?.correctAlternative.label}
-                <sub style={{ fontSize: "8px" }}>2</sub>
-              </strong>
-              .
+              {getFeedbackMessage(question, answerResult)}
+            </p>
+            <div style={styles.separator} />
+            <div style={styles.bottomBarInner}>
+              <ActionButton onClick={handleContinue}>Continue</ActionButton>
+            </div>
+          </div>
+        )}
+
+        {screenState === "notQuite" && (
+          <div style={styles.inner}>
+            <h1 style={styles.feedbackTitleWarning}>Not quite!</h1>
+            <p style={styles.feedbackText}>
+              {getFeedbackMessage(question, answerResult)}
             </p>
             <div style={styles.separator} />
             <div style={styles.bottomBarInner}>
