@@ -5,9 +5,11 @@ import java.util.stream.IntStream;
 import org.boduha.server.model.AnswerResult;
 import org.boduha.server.model.AnswerSubmission;
 import org.boduha.server.model.Question;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,28 +20,28 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 import jakarta.servlet.http.HttpSession;
 
 /**
- * Question controller uses a service that generates a question and checks its answer.
+ * Handles the main question-and-answer flow of a Boduha session.
+ *
+ * <p>This controller exposes endpoints for requesting the next question and
+ * submitting an answer. It keeps the current {@link UserState} in the HTTP
+ * session so each user can progress through an independent practice sequence.
+ *
+ * <p>The controller is responsible for session flow, while
+ * {@link QuestionService} is responsible for question generation.
  */
 @RestController
 public class QuestionController {
 
     /**
-     * 
+     * Logger for question flow events.
      */
     private static final Logger log = LoggerFactory.getLogger(QuestionController.class);
 
     /**
-     * 
+     * Service used to generate questions for the current user state.
      */
-    private final QuestionService questionService;
-
-    /**
-     * 
-     * @param questionService
-     */
-    public QuestionController(QuestionService questionService) {
-        this.questionService = questionService;
-    }
+    @Autowired
+    private QuestionService questionService;
 
     /**
      * 
@@ -58,7 +60,7 @@ public class QuestionController {
         }
 
         Question q = questionService.nextQuestion(state);
-        log.info("Sending question: {} {}", q);
+        log.info("Sending question: {}", q);
 
         return q;
     }
