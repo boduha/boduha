@@ -10,6 +10,7 @@ import java.util.Set;
 import org.boduha.server.model.Alternative;
 import org.boduha.server.model.Question;
 import org.boduha.server.model.QuestionType;
+
 import org.springframework.stereotype.Service;
 
 /**
@@ -265,7 +266,7 @@ public class QuestionService {
      * @param number
      * @return
      */
-    private String toBinary(int number) {
+    private static String toBinary(int number) {
         String raw = Integer.toBinaryString(number);
         int width = Math.max(4, raw.length());
         return String.format("%" + width + "s", raw).replace(' ', '0');
@@ -288,7 +289,7 @@ public class QuestionService {
      * @param bits
      * @return
      */
-    private String shiftLeft(String bits) {
+    private static String shiftLeft(String bits) {
         return bits.substring(1) + "0";
     }
 
@@ -297,7 +298,7 @@ public class QuestionService {
      * @param bits
      * @return
      */
-    private String shiftRight(String bits) {
+    private static String shiftRight(String bits) {
         return "0" + bits.substring(0, bits.length() - 1);
     }
 
@@ -306,7 +307,7 @@ public class QuestionService {
      * @param bits
      * @return
      */
-    private String reverse(String bits) {
+    private static String reverse(String bits) {
         return new StringBuilder(bits).reverse().toString();
     }
 
@@ -315,7 +316,7 @@ public class QuestionService {
      * @param bits
      * @return
      */
-    private String bitwiseNot(String bits) {
+    private static String bitwiseNot(String bits) {
         StringBuilder sb = new StringBuilder();
 
         for (char c : bits.toCharArray()) {
