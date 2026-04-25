@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import Button from "@mui/material/Button"
 import ActionButton from "./components/ActionButton"
 import { useTheme } from "@mui/material/styles"
@@ -319,6 +319,8 @@ export default function QuestionPage() {
   const [screenState, setScreenState] = useState<ScreenState>("loading")
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const SESSION_LENGTH = 8
+  const optionRefs = useRef<Array<HTMLButtonElement | null>>([])
+const continueRef = useRef<HTMLButtonElement | null>(null)
 
   const successPercentage =
     answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0
@@ -342,6 +344,79 @@ export default function QuestionPage() {
       setScreenState("error")
     }
   }
+
+  useEffect(() => {
+  if (screenState === "correct" || screenState === "notQuite") {
+    continueRef.current?.focus()
+  }
+}, [screenState])
+
+  useEffect(() => {
+    if (screenState !== "question" || !question) return
+
+    function handleKeyDown(event: KeyboardEvent) {
+      const alternatives = question.alternatives
+      if (alternatives.length === 0) return
+
+      const currentIndex = Math.max(
+        0,
+        alternatives.findIndex((a) => a.id === selectedAlternativeId),
+      )
+
+      const moveTo = (nextIndex: number) => {
+        const safeIndex = (nextIndex + alternatives.length) % alternatives.length
+        setSelectedAlternativeId(alternatives[safeIndex].id)
+        optionRefs.current[safeIndex]?.focus()
+      }
+
+      switch (event.key) {
+        case "ArrowDown":
+        case "ArrowRight":
+        case "s":
+        case "S":
+        case "d":
+        case "D":
+          event.preventDefault()
+          moveTo(currentIndex + 1)
+          break
+
+        case "ArrowUp":
+        case "ArrowLeft":
+        case "w":
+        case "W":
+        case "a":
+        case "A":
+          event.preventDefault()
+          moveTo(currentIndex - 1)
+          break
+
+case "1":
+case "2":
+case "3":
+case "4": {
+  const index = Number(event.key) - 1
+  if (alternatives[index]) {
+    event.preventDefault()
+    setSelectedAlternativeId(alternatives[index].id)
+    optionRefs.current[index]?.focus()
+  }
+  break
+}
+
+        case "Enter":
+        case " ": {
+          if (selectedAlternativeId) {
+            event.preventDefault()
+            void handleCheck()
+          }
+          break
+        }
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [question, selectedAlternativeId, screenState])
 
   useEffect(() => {
     let cancelled = false
@@ -501,9 +576,12 @@ export default function QuestionPage() {
           </div>
 
           <div style={styles.headerBlock}>
-            <h1 style={styles.promptTitle}>
+            <h1 id="question-title" style={styles.promptTitle}>
               <span style={styles.action}>{ac}</span> {rest}
             </h1>
+            <p id="question-help" style={styles.progressText}>
+              Use Tab or arrow keys to choose an answer, then Enter to check.
+            </p>
           </div>
 
           {question.type === "PLAIN" && <p style={styles.expression}>{question.value} = ?</p>}
@@ -535,29 +613,46 @@ export default function QuestionPage() {
             </table>
           )}
 
-          <div style={styles.choicesGrid}>
-            {question.alternatives.map((alternative) => {
+          <div
+            role="radiogroup"
+            aria-labelledby="question-title"
+            aria-describedby="question-help"
+            style={styles.choicesGrid}
+          >
+            {question.alternatives.map((alternative, index) => {
               const isSelected = selectedAlternativeId === alternative.id
-              const becomesTradition = screenState === "correct" && isSelected
 
               return (
                 <Button
+                  ref={(element) => {
+                    optionRefs.current[index] = element
+                  }}
+                  key={alternative.id}
+                  role="radio"
+                  aria-checked={isSelected}
+                  tabIndex={
+                    selectedAlternativeId
+                      ? isSelected
+                        ? 0
+                        : -1
+                      : index === 0
+                        ? 0
+                        : -1
+                  }
                   disableRipple
                   disableFocusRipple
-                  key={alternative.id}
                   fullWidth
+
                   onClick={() => {
                     const clickSound = new Audio("/sounds/tap.mp3")
                     clickSound.currentTime = 0
                     void clickSound.play()
                     setSelectedAlternativeId(alternative.id)
                   }}
+
                   sx={{
                     height: "64px",
                     fontSize: "1.5rem",
-                    fontWeight: becomesTradition ? 700 : 500,
-                    fontFamily: becomesTradition ? "Buenard, serif" : "system-ui, sans-serif",
-                    opacity: screenState === "correct" && !isSelected ? 0.6 : 1,
                     borderRadius: "16px",
                     textTransform: "none",
                     boxShadow: "none",
@@ -569,6 +664,10 @@ export default function QuestionPage() {
                       backgroundColor: isSelected ? palette.choiceSelectedBg : palette.choiceBg,
                       boxShadow: "none",
                     },
+                    "&:focus-visible": {
+                      outline: `4px solid ${palette.accentBlue}`,
+                      outlineOffset: "2px",
+                    },
                   }}
                 >
                   {alternative.label}
@@ -576,33 +675,38 @@ export default function QuestionPage() {
               )
             })}
           </div>
+
         </div>
       </section>
 
       <section style={styles.bottomBar}>
 
         {screenState === "correct" && (
-          <div style={styles.inner}>
+          <div style={styles.inner} aria-live="polite" aria-atomic="true">
             <h1 style={styles.feedbackTitle}>Correct!</h1>
             <p style={styles.feedbackText}>
-              {getFeedbackMessage(question, answerResult)}
+              {answerResult ? getFeedbackMessage(question, answerResult) : null}
             </p>
             <div style={styles.separator} />
             <div style={styles.bottomBarInner}>
-              <ActionButton onClick={handleContinue}>Continue</ActionButton>
+<ActionButton ref={continueRef} onClick={handleContinue}>
+  Continue
+</ActionButton>
             </div>
           </div>
         )}
 
         {screenState === "notQuite" && (
-          <div style={styles.inner}>
+          <div style={styles.inner} aria-live="polite" aria-atomic="true">
             <h1 style={styles.feedbackTitleWarning}>Not quite!</h1>
             <p style={styles.feedbackText}>
-              {getFeedbackMessage(question, answerResult)}
+              {answerResult ? getFeedbackMessage(question, answerResult) : null}
             </p>
             <div style={styles.separator} />
             <div style={styles.bottomBarInner}>
-              <ActionButton onClick={handleContinue}>Continue</ActionButton>
+<ActionButton ref={continueRef} onClick={handleContinue}>
+  Continue
+</ActionButton>
             </div>
           </div>
         )}
