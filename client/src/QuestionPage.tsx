@@ -9,11 +9,15 @@ import { logger } from "./logger"
 import type { AnswerResult, AnswerSubmission, Question } from "./types"
 
 type ScreenState =
+  | "start4"
+  | "start8"
   | "loading"
   | "question"
   | "correct"
   | "notQuite"
   | "error"
+  | "roundComplete4"
+  | "roundComplete8"
   | "sessionComplete"
 
 function hideStartupSplash() {
@@ -312,18 +316,30 @@ export default function QuestionPage() {
 
   const [question, setQuestion] = useState<Question | null>(null)
   const [answerResult, setAnswerResult] = useState<AnswerResult | null>(null)
+
   const [streak, setStreak] = useState(0)
   const [correctCount, setCorrectCount] = useState(0)
   const [answeredCount, setAnsweredCount] = useState(0)
-  const [selectedAlternativeId, setSelectedAlternativeId] = useState<string | null>(null)
-  const [screenState, setScreenState] = useState<ScreenState>("loading")
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const SESSION_LENGTH = 8
-  const optionRefs = useRef<Array<HTMLButtonElement | null>>([])
-const continueRef = useRef<HTMLButtonElement | null>(null)
-
   const successPercentage =
     answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0
+
+  const [sessionAnsweredCount, setSessionAnsweredCount] = useState(0)
+  const [sessionCorrectCount, setSessionCorrectCount] = useState(0)
+
+  const sessionSuccessPercentage =
+    sessionCorrectCount > 0 ? Math.round((sessionCorrectCount / sessionAnsweredCount) * 100) : 0
+
+  const [selectedAlternativeId, setSelectedAlternativeId] = useState<string | null>(null)
+
+  const [screenState, setScreenState] = useState<ScreenState>("start4")
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  const ROUND_LENGTH = 8
+  const [round, setRound] = useState<4 | 8>(4)
+
+  const optionRefs = useRef<Array<HTMLButtonElement | null>>([])
+  const continueRef = useRef<HTMLButtonElement | null>(null)
+
 
   async function loadQuestion() {
     try {
@@ -346,10 +362,10 @@ const continueRef = useRef<HTMLButtonElement | null>(null)
   }
 
   useEffect(() => {
-  if (screenState === "correct" || screenState === "notQuite") {
-    continueRef.current?.focus()
-  }
-}, [screenState])
+    if (screenState === "correct" || screenState === "notQuite") {
+      continueRef.current?.focus()
+    }
+  }, [screenState])
 
   useEffect(() => {
     if (screenState !== "question" || !question) return
@@ -390,18 +406,18 @@ const continueRef = useRef<HTMLButtonElement | null>(null)
           moveTo(currentIndex - 1)
           break
 
-case "1":
-case "2":
-case "3":
-case "4": {
-  const index = Number(event.key) - 1
-  if (alternatives[index]) {
-    event.preventDefault()
-    setSelectedAlternativeId(alternatives[index].id)
-    optionRefs.current[index]?.focus()
-  }
-  break
-}
+        case "1":
+        case "2":
+        case "3":
+        case "4": {
+          const index = Number(event.key) - 1
+          if (alternatives[index]) {
+            event.preventDefault()
+            setSelectedAlternativeId(alternatives[index].id)
+            optionRefs.current[index]?.focus()
+          }
+          break
+        }
 
         case "Enter":
         case " ": {
@@ -421,41 +437,61 @@ case "4": {
   useEffect(() => {
     let cancelled = false
 
-    async function loadInitialQuestion() {
-      try {
-        logger.debug("[BODUHA][CLIENT] Loading question")
-
-        const data: Question = await getNextQuestion()
-
-        if (cancelled) return
-
-        logger.debug("[BODUHA][CLIENT] Received question:", data)
-
-        setQuestion(data)
-        setSelectedAlternativeId(null)
-        setErrorMessage(null)
-        setAnswerResult(null)
-        setScreenState("question")
-      } catch (error) {
-        if (cancelled) return
-        logger.error("Error loading question", error)
-        setErrorMessage("Could not load question.")
-        setScreenState("error")
-      } finally {
-        if (cancelled) return
-        requestAnimationFrame(() => {
-          if (cancelled) return
-          hideStartupSplash()
-        })
-      }
-    }
-
-    void loadInitialQuestion()
+    requestAnimationFrame(() => {
+      if (cancelled) return
+      hideStartupSplash()
+    })
 
     return () => {
       cancelled = true
     }
   }, [])
+
+  async function handleStart4() {
+    try {
+      logger.debug("[BODUHA][CLIENT] Starting 4-bits session")
+      setRound(4)
+      setScreenState("loading")
+
+      const data: Question = await getNextQuestion()
+
+      logger.debug("[BODUHA][CLIENT] Received question:", data)
+
+      setQuestion(data)
+      setSelectedAlternativeId(null)
+      setErrorMessage(null)
+      setAnswerResult(null)
+      setScreenState("question")
+      setSessionAnsweredCount(0)
+      setSessionCorrectCount(0)
+    } catch (error) {
+      logger.error("Error starting session", error)
+      setErrorMessage("Could not start session.")
+      setScreenState("error")
+    }
+  }
+
+  async function handleStart8() {
+    try {
+      logger.debug("[BODUHA][CLIENT] Starting 8-bits session")
+      setRound(8)
+      setScreenState("loading")
+
+      const data: Question = await getNextQuestion()
+
+      logger.debug("[BODUHA][CLIENT] Received question:", data)
+
+      setQuestion(data)
+      setSelectedAlternativeId(null)
+      setErrorMessage(null)
+      setAnswerResult(null)
+      setScreenState("question")
+    } catch (error) {
+      logger.error("Error starting session", error)
+      setErrorMessage("Could not start session.")
+      setScreenState("error")
+    }
+  }
 
   async function handleCheck() {
     if (!selectedAlternativeId || !question) return
@@ -489,11 +525,14 @@ case "4": {
     const clickSound = new Audio("/sounds/tap.mp3")
     clickSound.currentTime = 0
     void clickSound.play()
-    if (answeredCount >= SESSION_LENGTH) {
-      setScreenState("sessionComplete")
+
+    if (answeredCount >= ROUND_LENGTH) {
+      setSessionAnsweredCount((current) => current + answeredCount)
+      setSessionCorrectCount((current) => current + correctCount)
+
+      setScreenState(round === 4 ? "roundComplete4" : "roundComplete8")
       return
     }
-
     setScreenState("loading")
     await loadQuestion()
   }
@@ -509,10 +548,35 @@ case "4": {
     )
   }
 
+  if (screenState === "start4") {
+    return (<main style={styles.main}>
+      <section style={styles.centeredState}>
+        <h1>Decimal to Binary 1/2</h1>
+        <p>4 bits</p>
+        <ActionButton onClick={handleStart4}>
+          Start
+        </ActionButton>
+      </section>
+    </main>
+    )
+  }
+
+  if (screenState === "start8") {
+    return (<main style={styles.main}>
+      <section style={styles.centeredState}>
+        <h1>Decimal to Binary 2/2</h1>
+        <p>8 bits</p>
+        <ActionButton onClick={handleStart8}>
+          Start
+        </ActionButton>
+      </section>
+    </main>
+    )
+  }
+
   if (!question) {
     return null
   }
-
   if (screenState === "sessionComplete") {
     return (
       <main style={styles.main}>
@@ -521,7 +585,60 @@ case "4": {
             <h1 style={styles.feedbackTitle}>Session complete!</h1>
 
             <p style={styles.sessionScoreFraction}>
-              {correctCount}/{SESSION_LENGTH} correct answers
+              {sessionCorrectCount}/{sessionAnsweredCount} correct answers
+            </p>
+
+            <p style={styles.sessionScorePercent}>{sessionSuccessPercentage}%</p>
+
+            <p style={styles.sessionSuccessPercentage}>
+              {sessionSuccessPercentage === 100
+                ? "Perfect. No errors."
+                : sessionSuccessPercentage >= 90
+                  ? "Almost perfect."
+                  : sessionSuccessPercentage >= 70
+                    ? "Good. A few mistakes."
+                    : sessionSuccessPercentage >= 50
+                      ? "Some gaps. Practice helps."
+                      : "Needs practice."}
+            </p>
+
+            <div style={styles.sessionRestartWrap}>
+              <ActionButton
+                onClick={async () => {
+                  const clickSound = new Audio("/sounds/tap.mp3")
+                  clickSound.currentTime = 0
+                  void clickSound.play()
+                  setAnsweredCount(0)
+                  setCorrectCount(0)
+                  setStreak(0)
+                  setSelectedAlternativeId(null)
+                  setAnswerResult(null)
+                  setErrorMessage(null)
+                  setRound(4)
+                  setScreenState("start4")
+                  setSessionAnsweredCount(0)
+                  setSessionCorrectCount(0)
+                  //await loadQuestion()
+                }}
+              >
+                Restart
+              </ActionButton>
+            </div>
+          </div>
+        </section>
+      </main>
+    )
+  }
+
+  if (screenState === "roundComplete4") {
+    return (
+      <main style={styles.main}>
+        <section style={styles.centeredState}>
+          <div style={styles.sessionCompleteWrap}>
+            <h1 style={styles.feedbackTitle}>4-bit round complete!</h1>
+
+            <p style={styles.sessionScoreFraction}>
+              {correctCount}/{ROUND_LENGTH} correct answers
             </p>
 
             <p style={styles.sessionScorePercent}>{successPercentage}%</p>
@@ -550,13 +667,51 @@ case "4": {
                   setSelectedAlternativeId(null)
                   setAnswerResult(null)
                   setErrorMessage(null)
-                  setScreenState("loading")
-                  await loadQuestion()
+                  setRound(8)
+                  setScreenState("start8")
                 }}
               >
-                Restart
+                Continue
               </ActionButton>
             </div>
+          </div>
+        </section>
+      </main>
+    )
+  }
+
+  if (screenState === "roundComplete8") {
+    return (
+      <main style={styles.main}>
+        <section style={styles.centeredState}>
+          <div style={styles.sessionCompleteWrap}>
+            <h1 style={styles.feedbackTitle}>8-bit round complete!</h1>
+
+            <p style={styles.sessionScoreFraction}>
+              {correctCount}/{ROUND_LENGTH} correct answers
+            </p>
+
+            <p style={styles.sessionScorePercent}>{successPercentage}%</p>
+
+            <p style={styles.sessionSupportText}>
+              {successPercentage === 100
+                ? "Perfect. No errors."
+                : successPercentage >= 90
+                  ? "Almost perfect."
+                  : successPercentage >= 70
+                    ? "Good. A few mistakes."
+                    : successPercentage >= 50
+                      ? "Some gaps. Practice helps."
+                      : "Needs practice."}
+            </p>
+
+            <ActionButton
+              onClick={() => {
+                setScreenState("sessionComplete")
+              }}
+            >
+              Finish
+            </ActionButton>
           </div>
         </section>
       </main>
@@ -585,7 +740,7 @@ case "4": {
           </div>
 
           {question.type === "PLAIN" && <p style={styles.expression}>{question.value} = ?</p>}
-          {question.type === "PARITY" && <p style={styles.expression}>Binary: {question.rows[0].right}</p>}
+          {question.type === "PARITY" && <p style={styles.expression}>{question.rows[0].right}</p>}
 
           {question.type === "TABLE" && question.rows && (
             <table style={styles.table}>
@@ -689,9 +844,9 @@ case "4": {
             </p>
             <div style={styles.separator} />
             <div style={styles.bottomBarInner}>
-<ActionButton ref={continueRef} onClick={handleContinue}>
-  Continue
-</ActionButton>
+              <ActionButton ref={continueRef} onClick={handleContinue}>
+                Continue
+              </ActionButton>
             </div>
           </div>
         )}
@@ -704,9 +859,9 @@ case "4": {
             </p>
             <div style={styles.separator} />
             <div style={styles.bottomBarInner}>
-<ActionButton ref={continueRef} onClick={handleContinue}>
-  Continue
-</ActionButton>
+              <ActionButton ref={continueRef} onClick={handleContinue}>
+                Continue
+              </ActionButton>
             </div>
           </div>
         )}

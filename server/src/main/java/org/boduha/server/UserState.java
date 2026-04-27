@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 import org.boduha.server.model.Alternative;
 
@@ -16,51 +17,36 @@ public class UserState {
      * 
      */
     private List<Integer> remaining;
-    
+
     /**
      * 
      */
     private final List<Integer> originalValues;
-    
+
     /**
      * 
      */
     private final Random random;
-    
+
+
+    private int bits;
+
     /**
      * 
      */
     private Alternative correctAlternative;
 
-    /**
-     * 
-     * @param values
-     */
-    public UserState(List<Integer> values) {
-        this(values, new Random());
-    }
-
-    /**
-     * 
-     * @param values
-     * @param random
-     */
-    public UserState(List<Integer> values, Random random) {
-        if (values == null || values.isEmpty()) {
-            throw new IllegalArgumentException("values must not be null or empty");
-        }
-        if (values.stream().anyMatch(value -> value == null)) {
-            throw new IllegalArgumentException("values must not contain null");
-        }
-        if (random == null) {
-            throw new IllegalArgumentException("random must not be null");
-        }
-
-        this.random = random;
-        this.originalValues = new ArrayList<>(values);
+    public UserState(int bits) {
+        this.bits = bits;
+        this.random = new Random();
+        this.originalValues = (IntStream.range(0, 1 << bits).boxed().toList());
         this.remaining = newShuffledCopy();
     }
 
+    public int getBits() {
+        return bits;
+    }
+    
     /**
      * 
      * @return

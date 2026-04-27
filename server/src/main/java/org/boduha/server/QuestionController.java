@@ -55,7 +55,7 @@ public class QuestionController {
             HttpSession session) {
 
         if (state == null) {
-            state = new UserState(IntStream.range(0, 16).boxed().toList());
+            state = new UserState(4);
             session.setAttribute("state", state);
         }
 
