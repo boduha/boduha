@@ -21,16 +21,11 @@ public class UserState {
     /**
      * 
      */
-    private final List<Integer> originalValues;
-
-    /**
-     * 
-     */
     private final Random random;
 
-
+    private static final int ROUND_LENGTH = 8;
     private int bits;
-
+    private int questionsServedInRound = 0;
     /**
      * 
      */
@@ -39,14 +34,26 @@ public class UserState {
     public UserState(int bits) {
         this.bits = bits;
         this.random = new Random();
-        this.originalValues = (IntStream.range(0, 1 << bits).boxed().toList());
-        this.remaining = newShuffledCopy();
-    }
+this.remaining = newShuffledValues(bits);    
+}
 
     public int getBits() {
         return bits;
     }
-    
+
+    public void recordQuestionServed() {
+        if (questionsServedInRound >= ROUND_LENGTH) {
+            questionsServedInRound = 0;
+            bits = bits == 4 ? 8 : 4;
+                    remaining = newShuffledValues(bits);
+        }
+        questionsServedInRound++;
+    }
+
+    public int getQuestionsServedInRound() {
+        return questionsServedInRound;
+    }
+
     /**
      * 
      * @return
@@ -61,7 +68,7 @@ public class UserState {
      */
     public int nextNumber() {
         if (remaining.isEmpty()) {
-            remaining = newShuffledCopy();
+                    remaining = newShuffledValues(bits);
         }
 
         return remaining.remove(0);
@@ -91,14 +98,12 @@ public class UserState {
         return remaining.size();
     }
 
-    /**
-     * 
-     * @return
-     */
-    private List<Integer> newShuffledCopy() {
-        List<Integer> shuffled = new ArrayList<>(originalValues);
-        Collections.shuffle(shuffled, random);
-        return shuffled;
-    }
+private List<Integer> newShuffledValues(int bits) {
+    List<Integer> values = new ArrayList<>(
+            IntStream.range(0, 1 << bits).boxed().toList()
+    );
+    Collections.shuffle(values, random);
+    return values;
+}
 
 }
