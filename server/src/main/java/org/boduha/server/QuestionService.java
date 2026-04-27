@@ -96,7 +96,7 @@ public class QuestionService {
                 2000 + questionCount,
                 number,
                 QuestionType.PARITY,
-                "Is it even or odd?",
+                "Is this binary number even or odd?",
                 alternatives,
                 List.of(new Question.TableRow("", binary)));
     }
