@@ -6,7 +6,7 @@
 
 **boduha** is a pedagogical tool designed to help Computer Science students master number base conversions and character representations through structured practice and guided exercises.
 
-https://github.com/user-attachments/assets/188f54f5-96de-4ce1-9a42-67821a59b664
+![Boduha demo showing a 4 bit question](https://github.com/user-attachments/assets/188f54f5-96de-4ce1-9a42-67821a59b664)
 
 ## Why boduha?
 
