@@ -597,14 +597,14 @@ export default function QuestionPage() {
 
             <p style={styles.sessionScorePercent}>
               {sessionSuccessPercentage === 100
-                ? "Perfect. No errors."
+                ? "Perfect"
                 : sessionSuccessPercentage >= 90
-                  ? "Almost perfect."
+                  ? "Almost perfect"
                   : sessionSuccessPercentage >= 70
-                    ? "Good. A few mistakes."
+                    ? "Good"
                     : sessionSuccessPercentage >= 50
-                      ? "Some gaps. Practice helps."
-                      : "Needs practice."}
+                      ? "Some gaps"
+                      : "Needs practice"}
             </p>
 
             <div style={styles.sessionRestartWrap}>
@@ -648,18 +648,6 @@ export default function QuestionPage() {
 
             <p style={styles.sessionScorePercent}>{successPercentage}%</p>
 
-            <p style={styles.sessionScorePercent}>
-              {successPercentage === 100
-                ? "Perfect. No errors."
-                : successPercentage >= 90
-                  ? "Almost perfect."
-                  : successPercentage >= 70
-                    ? "Good. A few mistakes."
-                    : successPercentage >= 50
-                      ? "Some gaps. Practice helps."
-                      : "Needs practice."}
-            </p>
-
             <div style={styles.sessionRestartWrap}>
               <ActionButton
                 onClick={async () => {
@@ -697,18 +685,6 @@ export default function QuestionPage() {
             </p>
 
             <p style={styles.sessionScorePercent}>{successPercentage}%</p>
-
-            <p style={styles.sessionScorePercent}>
-              {successPercentage === 100
-                ? "Perfect. No errors."
-                : successPercentage >= 90
-                  ? "Almost perfect."
-                  : successPercentage >= 70
-                    ? "Good. A few mistakes."
-                    : successPercentage >= 50
-                      ? "Some gaps. Practice helps."
-                      : "Needs practice."}
-            </p>
 
             <div style={styles.sessionRestartWrap}>
               <ActionButton
