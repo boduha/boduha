@@ -6,7 +6,9 @@
 
 **boduha** is a pedagogical tool designed to help Computer Science students master number base conversions and character representations through structured practice and guided exercises.
 
-## Origin of the Name
+https://github.com/user-attachments/assets/188f54f5-96de-4ce1-9a42-67821a59b664
+
+## Why boduha?
 
 The name **boduha** comes from the core topics covered by the tool:
 
@@ -17,6 +19,21 @@ The name **boduha** comes from the core topics covered by the tool:
 - **H** – Hexadecimal (base 16)
 - **A** – ASCII
 
+## Design Ideas
+
+- Questions are generated dynamically (not static database)
+- Each session is structured to reinforce learning patterns
+- Future goal: track user performance and learning progression
+
+## How it works
+
+- Short sessions (e.g., 8 questions)
+- Immediate feedback after each answer
+- Mixed question types:
+  - Decimal → Binary
+  - Pattern recognition (tables)
+  - Parity (even/odd)
+   
 ## License
 
 This project is licensed under the MIT License.
