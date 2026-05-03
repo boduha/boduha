@@ -26,6 +26,7 @@ public class UserState {
     private static final int ROUND_LENGTH = 8;
     private int bits;
     private int questionsServedInRound = 0;
+
     /**
      * 
      */
@@ -34,8 +35,8 @@ public class UserState {
     public UserState(int bits) {
         this.bits = bits;
         this.random = new Random();
-this.remaining = newShuffledValues(bits);    
-}
+        this.remaining = newShuffledValues(bits);
+    }
 
     public int getBits() {
         return bits;
@@ -45,7 +46,7 @@ this.remaining = newShuffledValues(bits);
         if (questionsServedInRound >= ROUND_LENGTH) {
             questionsServedInRound = 0;
             bits = bits == 4 ? 8 : 4;
-                    remaining = newShuffledValues(bits);
+            remaining = newShuffledValues(bits);
         }
         questionsServedInRound++;
     }
@@ -68,7 +69,7 @@ this.remaining = newShuffledValues(bits);
      */
     public int nextNumber() {
         if (remaining.isEmpty()) {
-                    remaining = newShuffledValues(bits);
+            remaining = newShuffledValues(bits);
         }
 
         return remaining.remove(0);
@@ -98,12 +99,11 @@ this.remaining = newShuffledValues(bits);
         return remaining.size();
     }
 
-private List<Integer> newShuffledValues(int bits) {
-    List<Integer> values = new ArrayList<>(
-            IntStream.range(0, 1 << bits).boxed().toList()
-    );
-    Collections.shuffle(values, random);
-    return values;
-}
+    private List<Integer> newShuffledValues(int bits) {
+        List<Integer> values = new ArrayList<>(
+                IntStream.range(0, 1 << bits).boxed().toList());
+        Collections.shuffle(values, random);
+        return values;
+    }
 
 }
