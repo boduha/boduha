@@ -11,7 +11,7 @@ export async function getNextQuestion(): Promise<Question> {
 }
 
 export async function submitAnswer(
-  questionId: string,
+  questionId: number,
   submission: AnswerSubmission
 ): Promise<AnswerResult> {
   const response = await fetch(`/question/${questionId}/answer`, {

@@ -80,7 +80,7 @@ function getFeedbackMessage(question: Question, answerResult: AnswerResult) {
   }
 }
 
-function formatBinary(value: string) {
+export function formatBinary(value: string) {
   return value.replaceAll(" ", "").replace(/(.{4})(?=.)/g, "$1 ")
 }
 
@@ -373,9 +373,9 @@ export default function QuestionPage() {
 
   useEffect(() => {
     if (screenState !== "question" || !question) return
-
+  const currentQuestion = question
     function handleKeyDown(event: KeyboardEvent) {
-      const alternatives = question.alternatives
+      const alternatives = currentQuestion.alternatives
       if (alternatives.length === 0) return
 
       const currentIndex = Math.max(
@@ -595,7 +595,7 @@ export default function QuestionPage() {
 
             <p style={styles.sessionScorePercent}>{sessionSuccessPercentage}%</p>
 
-            <p style={styles.sessionSuccessPercentage}>
+            <p style={styles.sessionScorePercent}>
               {sessionSuccessPercentage === 100
                 ? "Perfect. No errors."
                 : sessionSuccessPercentage >= 90
@@ -648,7 +648,7 @@ export default function QuestionPage() {
 
             <p style={styles.sessionScorePercent}>{successPercentage}%</p>
 
-            <p style={styles.sessionSuccessPercentage}>
+            <p style={styles.sessionScorePercent}>
               {successPercentage === 100
                 ? "Perfect. No errors."
                 : successPercentage >= 90
@@ -698,7 +698,7 @@ export default function QuestionPage() {
 
             <p style={styles.sessionScorePercent}>{successPercentage}%</p>
 
-            <p style={styles.sessionSuccessPercentage}>
+            <p style={styles.sessionScorePercent}>
               {successPercentage === 100
                 ? "Perfect. No errors."
                 : successPercentage >= 90
@@ -747,7 +747,7 @@ export default function QuestionPage() {
           </div>
 
           {question.type === "PLAIN" && <p style={styles.expression}>{question.value} = ?</p>}
-          {question.type === "PARITY" && <p style={styles.expression}>{question.rows[0].right}</p>}
+          {question.type === "PARITY" && question.rows && <p style={styles.expression}>{formatBinary(question.rows[0].right)}</p>}
 
           {question.type === "TABLE" && question.rows && (
             <table style={styles.table}>

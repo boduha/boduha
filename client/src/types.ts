@@ -7,7 +7,7 @@ export type TableRow = {
   left: string
   right: string
 }
-export type QuestionType = "PLAIN" | "TABLE"
+export type QuestionType = "PLAIN" | "TABLE" | "PARITY"
 
 export type Question = {
   id: number
