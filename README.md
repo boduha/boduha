@@ -1,4 +1,6 @@
 [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=boduha_boduha)](https://sonarcloud.io/summary/new_code?id=boduha_boduha)
+[![Java CI with Maven](https://github.com/boduha/boduha/actions/workflows/maven.yml/badge.svg)](https://github.com/boduha/boduha/actions/workflows/maven.yml)
+[![Node.js CI](https://github.com/boduha/boduha/actions/workflows/node.js.yml/badge.svg)](https://github.com/boduha/boduha/actions/workflows/node.js.yml)
 
 # boduha
 
