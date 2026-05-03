@@ -39,7 +39,7 @@ function getFeedbackMessage(question: Question, answerResult: AnswerResult) {
           {question.value}
           <sub style={{ fontSize: "8px" }}>10</sub> in binary is{" "}
           <strong>
-            {answerResult.correctAlternative.label}
+            {formatBinary(answerResult.correctAlternative.label)}
             <sub style={{ fontSize: "8px" }}>2</sub>
           </strong>
           .
@@ -53,7 +53,7 @@ function getFeedbackMessage(question: Question, answerResult: AnswerResult) {
 
       return (
         <>
-          {binary}
+          {formatBinary(binary)}
           <sub style={{ fontSize: "8px" }}>2</sub> is <strong>{parity}</strong>{" "}
           because it ends in {ending}.
         </>
@@ -65,8 +65,7 @@ function getFeedbackMessage(question: Question, answerResult: AnswerResult) {
 
       return (
         <>
-
-          {value}
+          {formatBinary(value)}
           <sub style={{ fontSize: "8px" }}>10</sub> in binary is{" "}
           <strong>
             {answerResult.correctAlternative.label}
@@ -80,6 +79,11 @@ function getFeedbackMessage(question: Question, answerResult: AnswerResult) {
       return null
   }
 }
+
+function formatBinary(value: string) {
+  return value.replaceAll(" ", "").replace(/(.{4})(?=.)/g, "$1 ")
+}
+
 export default function QuestionPage() {
   const theme = useTheme()
   const isDark = theme.palette.mode === "dark"
@@ -584,6 +588,7 @@ export default function QuestionPage() {
           <div style={styles.sessionCompleteWrap}>
             <h1 style={styles.feedbackTitle}>Session complete!</h1>
 
+            <p>Your results are:</p>
             <p style={styles.sessionScoreFraction}>
               {sessionCorrectCount}/{sessionAnsweredCount} correct answers
             </p>
@@ -643,7 +648,7 @@ export default function QuestionPage() {
 
             <p style={styles.sessionScorePercent}>{successPercentage}%</p>
 
-            <p style={styles.sessionSupportText}>
+            <p style={styles.sessionSuccessPercentage}>
               {successPercentage === 100
                 ? "Perfect. No errors."
                 : successPercentage >= 90
@@ -693,7 +698,7 @@ export default function QuestionPage() {
 
             <p style={styles.sessionScorePercent}>{successPercentage}%</p>
 
-            <p style={styles.sessionSupportText}>
+            <p style={styles.sessionSuccessPercentage}>
               {successPercentage === 100
                 ? "Perfect. No errors."
                 : successPercentage >= 90
@@ -705,13 +710,15 @@ export default function QuestionPage() {
                       : "Needs practice."}
             </p>
 
-            <ActionButton
-              onClick={() => {
-                setScreenState("sessionComplete")
-              }}
-            >
-              Finish
-            </ActionButton>
+            <div style={styles.sessionRestartWrap}>
+              <ActionButton
+                onClick={() => {
+                  setScreenState("sessionComplete")
+                }}
+              >
+                Finish
+              </ActionButton>
+            </div>
           </div>
         </section>
       </main>
@@ -760,7 +767,7 @@ export default function QuestionPage() {
                         borderLeft: `1px solid ${palette.tableBorder}`,
                       }}
                     >
-                      {row.right}
+                      {row.right === "?" ? "?" : formatBinary(row.right)}
                     </td>
                   </tr>
                 ))}
@@ -825,7 +832,7 @@ export default function QuestionPage() {
                     },
                   }}
                 >
-                  {alternative.label}
+                  {formatBinary(alternative.label)}
                 </Button>
               )
             })}

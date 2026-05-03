@@ -65,7 +65,7 @@ public class QuestionService {
      */
     private Question generateParityQuestion(UserState state) {
         int number = state.nextNumber();
-        String binary = toBinary(number, state.getBits());
+        String binary = BinaryUtils.toBinary(number, state.getBits());
 
         String correctText = binary.endsWith("0") ? "Even" : "Odd";
         String wrongText = correctText.equals("Even") ? "Odd" : "Even";
@@ -104,7 +104,7 @@ public class QuestionService {
         TablePattern pattern = nextTablePattern(state);
         int bits = state.getBits();
 
-        String correctBinary = toBinary(pattern.missingDecimal,state.getBits());
+        String correctBinary = BinaryUtils.toBinary(pattern.missingDecimal, state.getBits());
         String wrongBinary = generateWrongBinary(pattern, state);
 
         List<String> values = new ArrayList<>();
@@ -131,8 +131,9 @@ public class QuestionService {
                 "Follow the pattern",
                 alternatives,
                 List.of(
-                        new Question.TableRow(String.valueOf(pattern.first), toBinary(pattern.first, bits)),
-                        new Question.TableRow(String.valueOf(pattern.second), toBinary(pattern.second, bits)),
+                        new Question.TableRow(String.valueOf(pattern.first), BinaryUtils.toBinary(pattern.first, bits)),
+                        new Question.TableRow(String.valueOf(pattern.second),
+                                BinaryUtils.toBinary(pattern.second, bits)),
                         new Question.TableRow(String.valueOf(pattern.missingDecimal), "?")));
     }
 
@@ -168,13 +169,13 @@ public class QuestionService {
      */
     private String generateWrongBinary(TablePattern pattern, UserState state) {
         int bits = state.getBits();
-        String correct = toBinary(pattern.missingDecimal, bits);
+        String correct = BinaryUtils.toBinary(pattern.missingDecimal, bits);
 
         List<String> candidates = new ArrayList<>();
 
-        candidates.add(toBinary(Math.max(0, pattern.missingDecimal - 1), bits)); // off by one down
-        candidates.add(toBinary(pattern.missingDecimal + 1, bits)); // off by one up
-        candidates.add(toBinary(pattern.second, bits)); // copies previous answer
+        candidates.add(BinaryUtils.toBinary(Math.max(0, pattern.missingDecimal - 1), bits)); // off by one down
+        candidates.add(BinaryUtils.toBinary(pattern.missingDecimal + 1, bits)); // off by one up
+        candidates.add(BinaryUtils.toBinary(pattern.second, bits)); // copies previous answer
         candidates.add(oneBitWrong(correct)); // one bit mistake
         candidates.add(shiftLeft(correct)); // shift error
         candidates.add(shiftRight(correct)); // shift error
@@ -203,7 +204,7 @@ public class QuestionService {
      * @return
      */
     private List<Alternative> generateAlternatives(int number, UserState state) {
-        String correct = toBinary(number,state.getBits());
+        String correct = BinaryUtils.toBinary(number, state.getBits());
 
         Set<String> candidates = new LinkedHashSet<>();
         candidates.add(correct);
@@ -256,22 +257,6 @@ public class QuestionService {
 
         return result;
     }
-
-    /**
-     * 
-     * @param number
-     * @return
-     */
-private String toBinary(int value, int bits) {
-    String padded = String.format("%" + bits + "s", Integer.toBinaryString(value))
-            .replace(' ', '0');
-
-    if (bits <= 4) {
-        return padded;
-    }
-
-    return padded.substring(0, 4) + " " + padded.substring(4);
-}
 
     /**
      * 

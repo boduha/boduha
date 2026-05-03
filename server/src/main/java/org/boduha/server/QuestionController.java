@@ -1,8 +1,6 @@
 package org.boduha.server;
 
-import java.util.stream.IntStream;
-
-import org.boduha.server.model.AnswerResult;
+import org.boduha.server.model.AttemptResult;
 import org.boduha.server.model.AnswerSubmission;
 import org.boduha.server.model.Question;
 
@@ -22,11 +20,13 @@ import jakarta.servlet.http.HttpSession;
 /**
  * Handles the main question-and-answer flow of a Boduha session.
  *
- * <p>This controller exposes endpoints for requesting the next question and
+ * <p>
+ * This controller exposes endpoints for requesting the next question and
  * submitting an answer. It keeps the current {@link UserState} in the HTTP
  * session so each user can progress through an independent practice sequence.
  *
- * <p>The controller is responsible for session flow, while
+ * <p>
+ * The controller is responsible for session flow, while
  * {@link QuestionService} is responsible for question generation.
  */
 @RestController
@@ -73,13 +73,13 @@ public class QuestionController {
      * @return
      */
     @PostMapping("/question/{id}/answer")
-    public AnswerResult checkAnswer(
+    public AttemptResult checkAnswer(
             @PathVariable Integer id,
             @RequestBody AnswerSubmission submission,
             @SessionAttribute(name = "state") UserState state) {
 
         boolean correct = submission.answer().equals(state.getCorrectAlternative().id());
 
-        return new AnswerResult(id, submission.answer(), correct, state.getCorrectAlternative());
+        return new AttemptResult(id, submission.answer(), correct, state.getCorrectAlternative());
     }
 }
