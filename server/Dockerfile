@@ -11,6 +11,6 @@ FROM eclipse-temurin:21-jre-alpine
 RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 #WORKDIR /server
-COPY --from=build /server/target/*.jar server.jar
+COPY --from=build /target/*.jar server.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "server.jar"]
