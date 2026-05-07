@@ -1,7 +1,9 @@
 import type { Question, AnswerSubmission, AnswerResult } from "./types"
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? ""
+
 export async function getNextQuestion(): Promise<Question> {
-  const response = await fetch(`/question`)
+  const response = await fetch(`${API_BASE_URL}/question`)
 
   if (!response.ok) {
     throw new Error(`Failed to load question: ${response.status}`)
@@ -14,7 +16,7 @@ export async function submitAnswer(
   questionId: number,
   submission: AnswerSubmission
 ): Promise<AnswerResult> {
-  const response = await fetch(`/question/${questionId}/answer`, {
+  const response = await fetch(`${API_BASE_URL}/question/${questionId}/answer`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
