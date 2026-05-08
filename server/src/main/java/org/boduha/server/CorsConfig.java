@@ -15,6 +15,7 @@ public class CorsConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedOrigins(
+                                "https://boduha.onrender.com",
                                 "https://boduha-client.onrender.com",
                                 "http://localhost:5173")
                         .allowedMethods("*")
