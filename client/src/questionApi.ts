@@ -3,7 +3,7 @@ import type { Question, AnswerSubmission, AnswerResult } from "./types"
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? ""
 
 export async function getNextQuestion(): Promise<Question> {
-  const response = await fetch(`${API_BASE_URL}/question`)
+  const response = await fetch(`${API_BASE_URL}/question`, { credentials: "include" })
 
   if (!response.ok) {
     throw new Error(`Failed to load question: ${response.status}`)
@@ -21,6 +21,7 @@ export async function submitAnswer(
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify(submission),
   })
 
