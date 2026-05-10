@@ -18,10 +18,10 @@ export async function submitAnswer(
 ): Promise<AnswerResult> {
   const response = await fetch(`${API_BASE_URL}/question/${questionId}/answer`, {
     method: "POST",
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
     },
-    credentials: "include",
     body: JSON.stringify(submission),
   })
 
