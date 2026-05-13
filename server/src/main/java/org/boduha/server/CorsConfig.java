@@ -18,7 +18,7 @@ public class CorsConfig {
                                 "https://boduha.onrender.com",
                                 "https://boduha-client.onrender.com",
                                 "http://localhost:5173")
-                        .allowedMethods("*")
+                        .allowedMethods("GET", "POST", "PUT", "OPTIONS", "DELETE")
                         .allowedHeaders("*")
                         .allowCredentials(true);
             }
