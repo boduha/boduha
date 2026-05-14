@@ -502,9 +502,7 @@ export default function QuestionPage() {
 
     try {
       const submission: AnswerSubmission = { answer: selectedAlternativeId }
-      const clickSound = new Audio("/sounds/tap.mp3")
-      clickSound.currentTime = 0
-      void clickSound.play()
+
 
       const result = await submitAnswer(question.id, submission)
       setAnswerResult(result)
@@ -526,9 +524,7 @@ export default function QuestionPage() {
   }
 
   async function handleContinue() {
-    const clickSound = new Audio("/sounds/tap.mp3")
-    clickSound.currentTime = 0
-    void clickSound.play()
+
 
     if (answeredCount >= ROUND_LENGTH) {
       setSessionAnsweredCount((current) => current + answeredCount)
@@ -610,9 +606,7 @@ export default function QuestionPage() {
             <div style={styles.sessionRestartWrap}>
               <ActionButton
                 onClick={async () => {
-                  const clickSound = new Audio("/sounds/tap.mp3")
-                  clickSound.currentTime = 0
-                  void clickSound.play()
+ 
                   setAnsweredCount(0)
                   setCorrectCount(0)
                   setStreak(0)
@@ -623,8 +617,7 @@ export default function QuestionPage() {
                   setScreenState("start4")
                   setSessionAnsweredCount(0)
                   setSessionCorrectCount(0)
-                  //await loadQuestion()
-                }}
+                 }}
               >
                 Restart
               </ActionButton>
@@ -651,9 +644,6 @@ export default function QuestionPage() {
             <div style={styles.sessionRestartWrap}>
               <ActionButton
                 onClick={async () => {
-                  const clickSound = new Audio("/sounds/tap.mp3")
-                  clickSound.currentTime = 0
-                  void clickSound.play()
                   setAnsweredCount(0)
                   setCorrectCount(0)
                   setStreak(0)
@@ -780,6 +770,8 @@ export default function QuestionPage() {
 
                   onClick={() => {
                     const clickSound = new Audio("/sounds/tap.mp3")
+                              clickSound.volume = 0.4
+
                     clickSound.currentTime = 0
                     void clickSound.play()
                     setSelectedAlternativeId(alternative.id)
