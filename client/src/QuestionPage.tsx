@@ -184,7 +184,7 @@ export default function QuestionPage() {
         width: "100%",
         marginTop: "auto",
         paddingTop: "28px",
-        paddingBottom: "32px",
+        paddingBottom: "calc(32px + env(safe-area-inset-bottom))",
         display: "flex",
         flexDirection: "column" as const,
         alignItems: "stretch",
@@ -373,7 +373,7 @@ export default function QuestionPage() {
 
   useEffect(() => {
     if (screenState !== "question" || !question) return
-  const currentQuestion = question
+    const currentQuestion = question
     function handleKeyDown(event: KeyboardEvent) {
       const alternatives = currentQuestion.alternatives
       if (alternatives.length === 0) return
@@ -717,9 +717,6 @@ export default function QuestionPage() {
             <h1 id="question-title" style={styles.promptTitle}>
               <span style={styles.action}>{ac}</span> {rest}
             </h1>
-            <p id="question-help" style={styles.progressText}>
-              Use Tab or arrow keys to choose an answer, then Enter to check.
-            </p>
           </div>
 
           {question.type === "PLAIN" && <p style={styles.expression}>{question.value} = ?</p>}
