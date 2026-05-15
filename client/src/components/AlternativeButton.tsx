@@ -1,6 +1,8 @@
 import Button from "@mui/material/Button"
+
 import type { ReactNode } from "react"
 import { forwardRef } from "react"
+
 import { playTapSound } from "../sounds"
 
 type AlternativeButtonProps = {

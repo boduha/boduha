@@ -44,6 +44,7 @@ public class QuestionController {
     private QuestionService questionService;
 
     /**
+     * Returns a question for a given user.
      * 
      * @param state
      * @param session
@@ -66,6 +67,7 @@ public class QuestionController {
     }
 
     /**
+     * Checks the answer for the current question for this user.
      * 
      * @param id
      * @param submission

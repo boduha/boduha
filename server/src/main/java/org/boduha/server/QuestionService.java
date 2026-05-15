@@ -20,11 +20,12 @@ import org.springframework.stereotype.Service;
 public class QuestionService {
 
     /**
-     * 
+     * Generates numbers to give some variety on questions.
      */
     private final Random random = new Random();
 
     /**
+     * Returns a question for a given user.
      * 
      * @param state
      * @return
@@ -42,6 +43,7 @@ public class QuestionService {
     }
 
     /**
+     * Returns a plain question.
      * 
      * @param state
      * @return
@@ -59,6 +61,7 @@ public class QuestionService {
     }
 
     /**
+     * Returns a parity question.
      * 
      * @param state
      * @return
@@ -96,6 +99,7 @@ public class QuestionService {
     }
 
     /**
+     * Returns a table question.
      * 
      * @param state
      * @return

@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react"
+
+import { useTheme } from "@mui/material/styles"
+
 import AlternativeButton from "./components/AlternativeButton"
 import ActionButton from "./components/ActionButton"
-import { useTheme } from "@mui/material/styles"
 import { getNextQuestion, submitAnswer } from "./questionApi"
-
 import { logger } from "./logger"
 
 import type { AnswerResult, AnswerSubmission, Question } from "./types"

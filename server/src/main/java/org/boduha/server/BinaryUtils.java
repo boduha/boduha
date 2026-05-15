@@ -1,9 +1,12 @@
 package org.boduha.server;
 
+/**
+ * A utility class to help with 8-bit and 4-bit formating.
+ */
 public class BinaryUtils {
 
     /**
-     * 
+     * Convert a decimal value to binary format with a given bits length.
      * @param number
      * @return
      */

@@ -1,7 +1,9 @@
 import { StrictMode, useMemo } from "react"
 import { createRoot } from "react-dom/client"
 import { BrowserRouter } from "react-router-dom"
+
 import { CssBaseline, ThemeProvider, createTheme, useMediaQuery } from "@mui/material"
+
 import "./index.css"
 import BoduhaApp from "./BoduhaApp.tsx"
 
