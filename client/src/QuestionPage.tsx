@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react"
-import Button from "@mui/material/Button"
+import AlternativeButton from "./components/AlternativeButton"
 import ActionButton from "./components/ActionButton"
 import { useTheme } from "@mui/material/styles"
 import { getNextQuestion, submitAnswer } from "./questionApi"
@@ -748,13 +748,23 @@ export default function QuestionPage() {
               const isSelected = selectedAlternativeId === alternative.id
               const canAnswer = screenState === "question"
               return (
-                <Button
+                <AlternativeButton
                   ref={(element) => {
                     optionRefs.current[index] = element
                   }}
                   key={alternative.id}
-                  role="radio"
-                  aria-checked={isSelected}
+                  selected={isSelected}
+                  disabled={!canAnswer}
+                  choiceBg={palette.choiceBg}
+                  choiceBorder={palette.choiceBorder}
+                  choiceText={palette.choiceText}
+                  choiceSelectedBg={palette.choiceSelectedBg}
+                  choiceSelectedBorder={palette.choiceSelectedBorder}
+                  choiceSelectedText={palette.choiceSelectedText}
+                  accentBlue={palette.accentBlue}
+                  onClick={() => {
+                    setSelectedAlternativeId(alternative.id)
+                  }}
                   tabIndex={
                     selectedAlternativeId
                       ? isSelected
@@ -764,44 +774,10 @@ export default function QuestionPage() {
                         ? 0
                         : -1
                   }
-                  disableRipple
-                  disableFocusRipple
-                  fullWidth
-
-                  onClick={() => {
-                    if (!canAnswer) return
-
-                    const clickSound = new window.Audio("/sounds/tap.mp3")
-                    clickSound.volume = 0.4
-
-                    clickSound.currentTime = 0
-                    void clickSound.play()
-
-                    setSelectedAlternativeId(alternative.id)
-                  }}
-                  disabled={!canAnswer}
-                  sx={{
-                    height: "64px",
-                    fontSize: "1.5rem",
-                    borderRadius: "16px",
-                    textTransform: "none",
-                    boxShadow: "none",
-                    backgroundColor: isSelected ? palette.choiceSelectedBg : palette.choiceBg,
-                    color: isSelected ? palette.choiceSelectedText : palette.choiceText,
-                    border: `2px solid ${isSelected ? palette.choiceSelectedBorder : palette.choiceBorder
-                      }`,
-                    "&:hover": {
-                      backgroundColor: isSelected ? palette.choiceSelectedBg : palette.choiceBg,
-                      boxShadow: "none",
-                    },
-                    "&:focus-visible": {
-                      outline: `4px solid ${palette.accentBlue}`,
-                      outlineOffset: "2px",
-                    },
-                  }}
                 >
                   {formatBinary(alternative.label)}
-                </Button>
+                </AlternativeButton>
+
               )
             })}
           </div>

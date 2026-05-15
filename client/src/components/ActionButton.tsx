@@ -2,18 +2,7 @@ import Button from "@mui/material/Button"
 import { useTheme } from "@mui/material/styles"
 import type { ReactNode } from "react"
 import { forwardRef } from "react"
-
-let tapSound: HTMLAudioElement | null = null
-
-function playTapSound() {
-  if (!tapSound) {
-    tapSound = new window.Audio("/sounds/tap.mp3")
-  }
-          tapSound.volume = 0.4
-
-  tapSound.currentTime = 0
-  void tapSound.play().catch(() => {})
-}
+import { playTapSound } from "../sounds"
 
 type ActionButtonProps = {
   children: ReactNode
@@ -22,7 +11,7 @@ type ActionButtonProps = {
 }
 
 const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
- 
+
 
   function ActionButton({ children, onClick, disabled = false }, ref) {
     const theme = useTheme()
@@ -38,6 +27,7 @@ const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
       <Button
         ref={ref}
         onClick={() => {
+          if (disabled) return
           playTapSound()
           void onClick?.()
         }}
