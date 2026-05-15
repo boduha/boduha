@@ -606,7 +606,7 @@ export default function QuestionPage() {
             <div style={styles.sessionRestartWrap}>
               <ActionButton
                 onClick={async () => {
- 
+
                   setAnsweredCount(0)
                   setCorrectCount(0)
                   setStreak(0)
@@ -617,7 +617,7 @@ export default function QuestionPage() {
                   setScreenState("start4")
                   setSessionAnsweredCount(0)
                   setSessionCorrectCount(0)
-                 }}
+                }}
               >
                 Restart
               </ActionButton>
@@ -746,7 +746,7 @@ export default function QuestionPage() {
           >
             {question.alternatives.map((alternative, index) => {
               const isSelected = selectedAlternativeId === alternative.id
-
+              const canAnswer = screenState === "question"
               return (
                 <Button
                   ref={(element) => {
@@ -769,14 +769,17 @@ export default function QuestionPage() {
                   fullWidth
 
                   onClick={() => {
-                    const clickSound = new Audio("/sounds/tap.mp3")
-                              clickSound.volume = 0.4
+                    if (!canAnswer) return
+
+                    const clickSound = new window.Audio("/sounds/tap.mp3")
+                    clickSound.volume = 0.4
 
                     clickSound.currentTime = 0
                     void clickSound.play()
+
                     setSelectedAlternativeId(alternative.id)
                   }}
-
+                  disabled={!canAnswer}
                   sx={{
                     height: "64px",
                     fontSize: "1.5rem",
